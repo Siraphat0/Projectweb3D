@@ -36,7 +36,7 @@ FpsWalker.prototype.initialize = function () {
     this.app.root.addChild(floorEntity);
     this.floorEntity = floorEntity;
     // ─── Hide White Box in Floor 01 ───
-    var unwantedBox = app.root.findByName('Box') || app.root.findByGuid('e952058e-82e0-11ee-9eae-baf4d5e490e2');
+    var unwantedBox = this.app.root.findByName('Box') || this.app.root.findByGuid('e952058e-82e0-11ee-9eae-baf4d5e490e2');
     if (unwantedBox) {
         unwantedBox.enabled = false;
         if (unwantedBox.render) unwantedBox.render.enabled = false;
