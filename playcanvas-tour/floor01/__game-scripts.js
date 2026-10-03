@@ -35,6 +35,12 @@ FpsWalker.prototype.initialize = function () {
     floorEntity.setPosition(0, this.floorY, 0);
     this.app.root.addChild(floorEntity);
     this.floorEntity = floorEntity;
+    // ─── Hide White Box in Floor 01 ───
+    var unwantedBox = app.root.findByName('Box') || app.root.findByGuid('e952058e-82e0-11ee-9eae-baf4d5e490e2');
+    if (unwantedBox) {
+        unwantedBox.enabled = false;
+        if (unwantedBox.render) unwantedBox.render.enabled = false;
+    }
 
     // Spawn point at elevator (Floor 01)
     this.initialPos = new pc.Vec3(7.81, 3.34, -0.55);
