@@ -186,7 +186,7 @@
 
 
         <!-- Elevator / Stairs Prompt for Floor 05 -->
-        <div id="elevator-prompt" class="elevator-prompt-bar">
+        <div id="elevator-prompt" class="elevator-prompt-bar" onclick="if(window.showElevatorModal) window.showElevatorModal();" style="cursor:pointer;">
             <span>🛗</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 1, 2, 3, 4)</span>
         </div>
@@ -272,8 +272,24 @@
     (function() {
         var editorOpen = false, pendingPos = null, hotspots = [];
         var STORAGE_KEY = 'floor05_hotspots_v1';
-        try { var s=localStorage.getItem(STORAGE_KEY); if(s) hotspots=JSON.parse(s); } catch(e) {}
-        function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch(e) {} }
+        var DEFAULT_HOTSPOTS = [{"id": "hs_1790919302033", "name": "ห้อง9524", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "../9524/", "prox": 3, "pos": {"x": 7.59, "y": 0.83, "z": 1.509}}, {"id": "hs_1790919326005", "name": "ห้อง9525", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": {"x": 10.915, "y": 0.834, "z": 2.655}}, {"id": "hs_1790938341440", "name": "ลิฟต์ชั้น5", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": -2.702, "y": 0.9, "z": -0.123}}, {"id": "hs_1790938385079", "name": "ห้อง9516", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": {"x": -1.106, "y": 0.9, "z": -0.595}}, {"id": "hs_1790951011080", "name": "ห้อง9527", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": {"x": -2.912, "y": 0.899, "z": -2.432}}, {"id": "hs_1790957840429", "name": "บอท", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": {"x": 13.819, "y": 0.895, "z": 2.914}}];
+
+        try {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                hotspots = JSON.parse(saved);
+            }
+            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+                saveToStorage();
+            }
+        } catch (e) {
+            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+        }
+
+        function saveToStorage() {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
+        } catch(e) {} }
         window.toggleHotspotEditor = function() {
             editorOpen = !editorOpen;
             var p=document.getElementById('hotspot-editor'); var b=document.getElementById('hs-editor-toggle-btn');
@@ -299,12 +315,12 @@
         window.hotspotEditorSave = function() {
             if(!pendingPos){alert('กด "วางจุด Hotspot" ก่อน');return;}
             var hs={id:'hs_'+Date.now(),name:document.getElementById('hs-name').value.trim()||'Hotspot',hint:document.getElementById('hs-hint').value.trim()||'คลิกเพื่อเข้า',icon:document.getElementById('hs-icon').value.trim()||'🚪',url:document.getElementById('hs-url').value.trim()||'#',prox:parseFloat(document.getElementById('hs-prox').value)||3,pos:{x:+pendingPos.x.toFixed(3),y:+pendingPos.y.toFixed(3),z:+pendingPos.z.toFixed(3)}};
-            hotspots.push(hs); save();
+            hotspots.push(hs); saveToStorage();
             if(window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
             hotspotEditorCancelForm(); ['hs-name','hs-hint','hs-url'].forEach(function(id){document.getElementById(id).value='';}); renderList();
         };
         window.hotspotEditorDelete = function(id) {
-            hotspots=hotspots.filter(function(h){return h.id!==id;}); save();
+            hotspots=hotspots.filter(function(h){return h.id!==id;}); saveToStorage();
             if(window._hotspotEditorUnregister) window._hotspotEditorUnregister(id); renderList();
         };
         window.hotspotEditorExport = function() {

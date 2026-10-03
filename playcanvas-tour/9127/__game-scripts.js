@@ -1,4 +1,4 @@
-// Room 9127 FPS Walker - Full parity with Floor 01/03/04/05
+﻿// Room 9127 FPS Walker - Full parity with Floor 01/03/04/05
 // Provides smooth mouse look (drag + pointer lock), natural WASD locomotion,
 // head bobbing, footsteps audio, and doorway portal back to Floor 01.
 
@@ -331,26 +331,10 @@ FpsWalker.prototype.update = function (dt) {
         this.eyeEntity.setLocalEulerAngles(0, 0, Math.cos(this.bobTimer * 0.5) * 0.65 * this.bobWeight);
     }
 
-    // ─── 5. Doorway Return to Floor 01 Prompt ───
-    var doorPrompt = document.getElementById("door-prompt");
-    if (doorPrompt) {
-        var p = this.entity.getPosition();
-        var distToExit = Math.hypot(p.x - this.initialPos.x, p.z - this.initialPos.z);
-        if (distToExit < 4.0) {
-            if (doorPrompt.style.display !== "flex") doorPrompt.style.display = "flex";
-            if (app.keyboard.wasPressed(pc.KEY_E)) {
-                if (typeof window.portalToFloor01 === "function") {
-                    window.portalToFloor01();
-                }
-            }
-        } else {
-            // Keep prompt accessible or visible
-            if (doorPrompt.style.display !== "flex") doorPrompt.style.display = "flex";
-            if (app.keyboard.wasPressed(pc.KEY_E)) {
-                if (typeof window.portalToFloor01 === "function") {
-                    window.portalToFloor01();
-                }
-            }
+    // ─── 5. [E] key — Return to Floor 01 at Hotspot position ───
+    if (app.keyboard.wasPressed(pc.KEY_E)) {
+        if (typeof window.portalToFloor01 === "function") {
+            window.portalToFloor01();
         }
     }
 };

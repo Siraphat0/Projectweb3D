@@ -296,14 +296,24 @@
         var pendingPos = null;
         var hotspots = [];
         var STORAGE_KEY = 'inside_hotspots_v1';
+        var DEFAULT_HOTSPOTS = [{"id": "hs_elevator_main", "name": "ลิฟต์อาคาร SC.09", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 5, "pos": {"x": -7.7, "y": 1.42, "z": -0.4}}];
 
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) hotspots = JSON.parse(saved);
-        } catch (e) {}
+            if (saved) {
+                hotspots = JSON.parse(saved);
+            }
+            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+                saveToStorage();
+            }
+        } catch (e) {
+            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+        }
 
         function saveToStorage() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
+        } catch (e) {}
         }
 
         window.toggleHotspotEditor = function () {

@@ -191,7 +191,7 @@
 
 
         <!-- Elevator / Stairs Prompt for Going Down -->
-        <div id="elevator-prompt" class="elevator-prompt-bar">
+        <div id="elevator-prompt" class="elevator-prompt-bar" onclick="if(window.showElevatorModal) window.showElevatorModal();" style="cursor:pointer;">
             <span>🛗</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 1, 3, 4, 5)</span>
         </div>
@@ -317,14 +317,24 @@
         var pendingPos = null;
         var hotspots = [];
         var STORAGE_KEY = 'floor02_hotspots_v1';
+        var DEFAULT_HOTSPOTS = [{"id": "hs_elevator_floor02", "name": "ลิฟต์ชั้น 2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 5, "pos": {"x": -7.7, "y": 0.35, "z": -0.4}}];
 
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) hotspots = JSON.parse(saved);
-        } catch (e) {}
+            if (saved) {
+                hotspots = JSON.parse(saved);
+            }
+            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+                saveToStorage();
+            }
+        } catch (e) {
+            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+        }
 
         function saveToStorage() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
+        } catch (e) {}
         }
 
         window.toggleHotspotEditor = function () {

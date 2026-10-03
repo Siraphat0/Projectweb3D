@@ -197,7 +197,7 @@
 
 
         <!-- Elevator Prompt Banner (E key near elevator) -->
-        <div id="elevator-prompt" class="elevator-prompt-bar">
+        <div id="elevator-prompt" class="elevator-prompt-bar" onclick="if(window.showElevatorModal) window.showElevatorModal();" style="cursor:pointer;">
             <span>🛗</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 2, 3, 4, 5)</span>
         </div>
@@ -336,33 +336,24 @@
         var pendingPos = null;
         var hotspots = [];
         var STORAGE_KEY = 'floor01_hotspots_v1';
+        var DEFAULT_HOTSPOTS = [{"id": "hs_1790865753234", "name": "ติดต่อฝ่ายวิชาการ/ธุรการ", "hint": "คลิกเพื่อดูข้อมูลนักศึกษา", "icon": "📍", "url": "https://computing.kku.ac.th/students", "prox": 3, "pos": {"x": -7.117, "y": 3.34, "z": -3.903}}, {"id": "hs_1790865815184", "name": "ห้อง9127", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9127/", "prox": 3, "pos": {"x": -26.087, "y": 3.34, "z": -20.398}}, {"id": "hs_1790938266824", "name": "ลิฟต์ชั้น1", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": 10.533, "y": 3.34, "z": -2.68}}];
 
-                        // Load from localStorage & sanitize broken icons
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 hotspots = JSON.parse(saved);
             }
             if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
-                hotspots = [{"id":"hs_academic_contact","name":"ติดต่อฝ่ายวิชาการ/ธุรการ","hint":"คลิกเพื่อดูข้อมูลนักศึกษา","icon":"📍","url":"https://computing.kku.ac.th/students","prox":3,"pos":{"x":-7.117,"y":3.34,"z":-3.903}},{"id":"hs_room_9127","name":"ห้อง 9127","hint":"กด [E] หรือคลิกเพื่อเข้าห้อง","icon":"🚪","url":"../9127/","prox":3,"pos":{"x":-26.087,"y":3.34,"z":-20.398}},{"id":"hs_elevator_floor01","name":"ลิฟต์ชั้น 1","hint":"กด [E] หรือคลิกเพื่อเลือกชั้น","icon":"🛗","url":"#elevator","prox":3,"pos":{"x":10.533,"y":3.34,"z":-2.68}}];
+                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
                 saveToStorage();
-            } else {
-                var modified = false;
-                hotspots.forEach(function(h) {
-                    var isElev = h.name && h.name.indexOf('ลิฟต์') !== -1;
-                    if (!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1 || h.icon.length > 8) {
-                        h.icon = isElev ? '🛗' : '📍';
-                        modified = true;
-                    }
-                });
-                if (modified) saveToStorage();
             }
-        } catch(e) {
-            hotspots = [{"id":"hs_academic_contact","name":"ติดต่อฝ่ายวิชาการ/ธุรการ","hint":"คลิกเพื่อดูข้อมูลนักศึกษา","icon":"📍","url":"https://computing.kku.ac.th/students","prox":3,"pos":{"x":-7.117,"y":3.34,"z":-3.903}},{"id":"hs_room_9127","name":"ห้อง 9127","hint":"กด [E] หรือคลิกเพื่อเข้าห้อง","icon":"🚪","url":"../9127/","prox":3,"pos":{"x":-26.087,"y":3.34,"z":-20.398}},{"id":"hs_elevator_floor01","name":"ลิฟต์ชั้น 1","hint":"กด [E] หรือคลิกเพื่อเลือกชั้น","icon":"🛗","url":"#elevator","prox":3,"pos":{"x":10.533,"y":3.34,"z":-2.68}}];
+        } catch (e) {
+            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
         }
 
         function saveToStorage() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch(e) {}
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
+        } catch(e) {}
         }
 
         window.toggleHotspotEditor = function() {
