@@ -1,23 +1,9 @@
 ﻿{
-  "cleanUrls": true,
-  "headers": [
+  "redirects": [
     {
-      "source": "/(.*).wasm",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/wasm"
-        }
-      ]
-    },
-    {
-      "source": "/(.*).sog",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/octet-stream"
-        }
-      ]
+      "source": "/",
+      "destination": "/playcanvas-tour/",
+      "permanent": false
     }
   ]
 }
