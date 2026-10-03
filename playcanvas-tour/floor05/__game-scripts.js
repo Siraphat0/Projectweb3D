@@ -219,22 +219,101 @@ FpsWalker.prototype.initialize = function () {
     });
 
     // ─── Hotspot Editor API ───────────────────────────────────────────────────
-    this.hotspots = [];
+    this.hotspots = [
+        {
+            id: 'hs_elevator_floor05',
+            name: 'ลิฟต์ชั้น 5',
+            hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
+            icon: '🛗',
+            url: '#elevator',
+            worldPos: new pc.Vec3(0.0, 1.6, 0.0),
+            prox: 5.0,
+            action: function () {
+                if (window.showElevatorModal) window.showElevatorModal();
+            }
+        }
+    ];
 
     window._hotspotEditorGetPos = function () {
         var pos = self.entity.getPosition();
         return { x: pos.x, y: pos.y, z: pos.z };
     };
 
-    window._hotspotEditorRegister = function (hs) {
+    function createHotspotDomF05(hs) {
+        var existing = document.getElementById(hs.id);
+        if (existing) { hs.dom = existing; return existing; }
+        var isElev = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url === '#elevator');
+        var el = document.createElement('div');
+        el.id = hs.id;
+        el.className = 'hotspot-3d';
+        el.title = hs.name;
+        var iconHtml = isElev ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (hs.icon || '📍');
+        el.innerHTML = '<div class="hotspot-ring"></div>' +
+                       '<div class="hotspot-dot">' + iconHtml + '</div>' +
+                       '<div class="hotspot-label">' +
+                       '  <span class="hotspot-title">' + hs.name + '</span>' +
+                       '  <span class="hotspot-hint">' + (hs.hint || 'คลิกเพื่อเข้า') + '</span>' +
+                       '</div>';
+        el.onclick = function () {
+            if (hs.action) { hs.action(); return; }
+            if (isElev && window.showElevatorModal) { window.showElevatorModal(); return; }
+            if (hs.url && hs.url.startsWith('http')) { window.open(hs.url, '_blank'); return; }
+            if (hs.url && hs.url !== '#') window.location.href = hs.url;
+        };
+        el.style.display = 'none';
+        document.body.appendChild(el);
+        hs.dom = el;
+        return el;
+    }
+
+    window._hotspotEditorRegister = function (data) {
+        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
+        if (existing) return;
+
+        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
+        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
+        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
+        var isElev = (data.name && data.name.indexOf('ลิฟต์') !== -1) || (data.url === '#elevator');
+
+        var hs = {
+            id: data.id,
+            name: data.name,
+            hint: data.hint,
+            icon: data.icon || '📍',
+            url: data.url,
+            worldPos: new pc.Vec3(posX, posY, posZ),
+            prox: data.prox || 3.0,
+            action: function () {
+                if (isElev && window.showElevatorModal) { window.showElevatorModal(); return; }
+                if (data.url && data.url.startsWith('http')) { window.open(data.url, '_blank'); return; }
+                if (data.url && data.url !== '#') window.location.href = data.url;
+            }
+        };
+        createHotspotDomF05(hs);
         self.hotspots.push(hs);
     };
 
     window._hotspotEditorUnregister = function (id) {
         self.hotspots = self.hotspots.filter(function (h) { return h.id !== id; });
-        var el = document.getElementById('hs-dot-' + id);
+        var el = document.getElementById(id);
         if (el) el.remove();
     };
+
+    // Load saved hotspots from localStorage
+    try {
+        var savedHs = localStorage.getItem('floor05_hotspots_v1');
+        if (savedHs) {
+            var parsed = JSON.parse(savedHs);
+            if (Array.isArray(parsed)) {
+                parsed.forEach(function (item) {
+                    window._hotspotEditorRegister(item);
+                });
+            }
+        }
+    } catch (e) {}
+
+    // Init DOM for default hotspots
+    self.hotspots.forEach(function(hs) { createHotspotDomF05(hs); });
 
     // Ctrl+H toggles hotspot editor panel
     window.addEventListener('keydown', function (e) {
@@ -244,6 +323,8 @@ FpsWalker.prototype.initialize = function () {
             if (panel) panel.style.display = (panel.style.display === 'none' ? 'flex' : 'none');
         }
     });
+
+    window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
 FpsWalker.prototype.update = function (dt) {
@@ -372,18 +453,27 @@ FpsWalker.prototype.update = function (dt) {
 
     // ─── Hotspot 2D Projection ───
     if (this.hotspots && this.hotspots.length > 0 && this.eyeEntity) {
-        var cam = this.eyeEntity;
+        var cam5 = this.eyeEntity;
+        var camPos5 = cam5.getPosition();
+        var camFwd5 = cam5.forward;
+        var screenPos5 = new pc.Vec3();
         for (var hi = 0; hi < this.hotspots.length; hi++) {
-            var hs  = this.hotspots[hi];
-            var dot = document.getElementById('hs-dot-' + hs.id);
-            if (!dot) continue;
-            var screenPos = cam.camera.worldToScreen(new pc.Vec3(hs.x, hs.y, hs.z));
-            if (screenPos.z > 0) {
-                dot.style.left    = screenPos.x + 'px';
-                dot.style.top     = screenPos.y + 'px';
-                dot.style.display = 'block';
+            var hs5  = this.hotspots[hi];
+            var dot5 = hs5.dom || document.getElementById(hs5.id);
+            if (!dot5) continue;
+            var hsWp = hs5.worldPos || new pc.Vec3(hs5.x || 0, hs5.y || 0, hs5.z || 0);
+            cam5.camera.worldToScreen(hsWp, screenPos5);
+            var toHs5 = hsWp.clone().sub(camPos5).normalize();
+            var dot5val = camFwd5 ? camFwd5.dot(toHs5) : 1;
+            var dist5 = Math.hypot(pos.x - hsWp.x, pos.z - hsWp.z);
+            if (dot5val > 0.15 && screenPos5.z > 0 && dist5 < 22.0) {
+                dot5.style.display = 'flex';
+                dot5.style.left    = Math.round(screenPos5.x) + 'px';
+                dot5.style.top     = Math.round(screenPos5.y) + 'px';
+                var scale5 = pc.math.clamp(1.15 - (dist5 / 22.0), 0.7, 1.2);
+                dot5.style.transform = 'translate(-50%,-50%) scale(' + scale5.toFixed(2) + ')';
             } else {
-                dot.style.display = 'none';
+                dot5.style.display = 'none';
             }
         }
     }

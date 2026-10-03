@@ -30,7 +30,6 @@ FpsWalker.prototype.initialize = function () {
         friction: 0.05,
         restitution: 0
     });
-    // Raised invisible floor higher so the player walks cleanly above the surface
     this.floorY = -0.20;
     floorEntity.setPosition(0, this.floorY, 0);
     this.app.root.addChild(floorEntity);
@@ -63,6 +62,7 @@ FpsWalker.prototype.initialize = function () {
     if (this.entity.rigidbody) {
         this.entity.rigidbody.teleport(this.initialPos, this.eulers);
     }
+
     var eyeEntity = new pc.Entity('PlayerEye');
     eyeEntity.addComponent('camera', {
         fov: 45,
@@ -204,6 +204,123 @@ FpsWalker.prototype.initialize = function () {
     window.addEventListener('touchend', function () {
         self.isDragging = false;
     });
+
+    // ─── Hotspot System & Admin Tool Integration ───
+    this.hotspots = [
+        {
+            id: 'hs_elevator_floor02',
+            name: 'ลิฟต์ชั้น 2',
+            hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
+            icon: '🛗',
+            url: '#elevator',
+            worldPos: new pc.Vec3(0.0, 1.3, 0.0),
+            prox: 5.0,
+            action: function () {
+                if (window.showElevatorModal) window.showElevatorModal();
+            }
+        }
+    ];
+
+    // Expose position to Admin Editor
+    window._hotspotEditorGetPos = function () {
+        var p = self.entity.getPosition();
+        return { x: p.x, y: p.y, z: p.z };
+    };
+
+    // Helper to create or bind DOM element for a hotspot
+    function createHotspotDom(hs) {
+        var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url === '#elevator');
+        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (hs.icon && hs.icon.length <= 4 ? hs.icon : '📍');
+        var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
+
+        var el = document.getElementById(hs.id);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = hs.id;
+            el.className = 'hotspot-3d';
+            el.title = hs.name;
+            el.innerHTML = '<div class="hotspot-ring"></div>' +
+                           '<div class="hotspot-dot">' + iconHtml + '</div>' +
+                           '<div class="hotspot-label">' +
+                           '  <span class="hotspot-title">' + hs.name + '</span>' +
+                           '  <span class="hotspot-hint">' + hintText + '</span>' +
+                           '</div>';
+            el.onclick = function () {
+                if (hs.action) hs.action();
+                else if (hs.url && hs.url !== '#') window.location.href = hs.url;
+            };
+            document.body.appendChild(el);
+        } else {
+            var dotEl = el.querySelector('.hotspot-dot');
+            if (dotEl) dotEl.innerHTML = iconHtml;
+            var hintEl = el.querySelector('.hotspot-hint');
+            if (hintEl) hintEl.textContent = hintText;
+        }
+        hs.dom = el;
+        return el;
+    }
+
+    // Register / Unregister hooks for Admin Editor
+    window._hotspotEditorRegister = function (data) {
+        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
+        if (existing) return;
+
+        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
+        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
+        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
+
+        var isElevator = (data.name && data.name.indexOf('ลิฟต์') !== -1) || (data.url === '#elevator');
+        var cleanIcon = isElevator ? '🛗' : (data.icon && data.icon.length <= 4 ? data.icon : '📍');
+
+        var hs = {
+            id: data.id,
+            name: data.name,
+            hint: data.hint,
+            icon: cleanIcon,
+            url: data.url,
+            worldPos: new pc.Vec3(posX, posY, posZ),
+            prox: data.prox || 3.0,
+            action: function () {
+                if (isElevator && window.showElevatorModal) {
+                    window.showElevatorModal();
+                    return;
+                }
+                if (data.url && data.url.startsWith('http')) {
+                    window.open(data.url, '_blank');
+                    return;
+                }
+                if (data.url && data.url !== '#') window.location.href = data.url;
+            }
+        };
+        createHotspotDom(hs);
+        self.hotspots.push(hs);
+    };
+
+    window._hotspotEditorUnregister = function (id) {
+        self.hotspots = self.hotspots.filter(function (h) { return h.id !== id; });
+        var el = document.getElementById(id);
+        if (el) el.remove();
+    };
+
+    // Load any saved custom hotspots from localStorage
+    try {
+        var savedHs = localStorage.getItem('floor02_hotspots_v1');
+        if (savedHs) {
+            var parsed = JSON.parse(savedHs);
+            if (Array.isArray(parsed)) {
+                parsed.forEach(function (item) {
+                    window._hotspotEditorRegister(item);
+                });
+            }
+        }
+    } catch (e) {}
+
+    // Init existing DOM elements for default hotspots
+    this.hotspots.forEach(function (hs) {
+        createHotspotDom(hs);
+    });
+
+    window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
 FpsWalker.prototype.rotateCamera = function (dx, dy) {
@@ -265,14 +382,41 @@ FpsWalker.prototype.update = function (dt) {
         this.entity.rigidbody.linearVelocity = new pc.Vec3(this.currentVelocity.x, yVel, this.currentVelocity.z);
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
 
-        // ─── 4. Elevator Prompt Check ───
+        // ─── Hotspots & Proximity Triggers ───
+        var cam = this.eyeEntity ? this.eyeEntity.camera : null;
+        var camFwd = this.eyeEntity ? this.eyeEntity.forward : null;
+        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
+        var screenPos = new pc.Vec3();
+
+        for (var i = 0; i < this.hotspots.length; i++) {
+            var hs = this.hotspots[i];
+            var dist = Math.hypot(pos.x - hs.worldPos.x, pos.z - hs.worldPos.z);
+            var el = hs.dom || document.getElementById(hs.id);
+
+            if (el && cam) {
+                cam.worldToScreen(hs.worldPos, screenPos);
+                var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                if (dot > 0.15 && screenPos.z > 0 && dist < 22.0) {
+                    el.style.display = 'flex';
+                    el.style.left = Math.round(screenPos.x) + 'px';
+                    el.style.top = Math.round(screenPos.y) + 'px';
+                    var scale = pc.math.clamp(1.15 - (dist / 22.0), 0.7, 1.2);
+                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        }
+
+        // Elevator Prompt Banner
         var elevatorPrompt = document.getElementById('elevator-prompt');
         if (elevatorPrompt) {
-            // When near elevator area
             if (pos.x <= -6.0) {
                 if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';
                 if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (window.portalToFloor01) window.portalToFloor01();
+                    if (window.showElevatorModal) window.showElevatorModal();
                 }
             } else {
                 if (elevatorPrompt.style.display === 'flex') elevatorPrompt.style.display = 'none';
@@ -283,7 +427,7 @@ FpsWalker.prototype.update = function (dt) {
         isGrounded = true;
     }
 
-    // ─── 5. Realistic Human Head Bobbing, Breathing & Footsteps ───
+    // ─── 4. Realistic Human Head Bobbing, Breathing & Footsteps ───
     var moveSpeed = this.currentVelocity.length();
     var isMoving = (moveSpeed > 0.4) && isGrounded;
     var stepRate = isSprinting ? 12.8 : 9.6;
