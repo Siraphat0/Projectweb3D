@@ -35,8 +35,14 @@ FpsWalker.prototype.initialize = function () {
     this.app.root.addChild(floorEntity);
     this.floorEntity = floorEntity;
 
-    this.initialPos = this.entity.getPosition().clone();
+    this.initialPos = new pc.Vec3(1.54, 3.34, 9.52);
     this.initialRot = this.entity.getEulerAngles().clone();
+    this.entity.setPosition(this.initialPos);
+    if (this.entity.rigidbody) {
+        this.entity.rigidbody.linearVelocity = pc.Vec3.ZERO;
+        this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
+        this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
+    }
 
     // ─── Eye Entity for Natural Head Motion & Bobbing ───
     var eyeEntity = new pc.Entity('PlayerEye');
