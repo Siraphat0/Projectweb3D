@@ -203,8 +203,6 @@ FpsWalker.prototype.initialize = function () {
         return { x: p.x, y: p.y, z: p.z };
     };
 
-    // Central Hotspot Action & Portal Router
-    // Central Hotspot Action & Portal Router
     function handleHotspotAction(url, name, customAction) {
         if (typeof customAction === 'function') {
             customAction();
@@ -213,8 +211,7 @@ FpsWalker.prototype.initialize = function () {
         url = url || '';
         name = name || '';
 
-        // 1. Elevator modal triggers: ONLY when url is '#elevator' or '#modal' or if name is specifically elevator
-        var isElev = url === '#elevator' || url === '#modal' || (name && (name.indexOf('ลิฟต์') !== -1 || name.indexOf('ลิฟต์') !== -1));
+        var isElev = url === '#elevator' || url === '#modal' || (name && name.indexOf('ลิฟต์') !== -1);
         if (isElev) {
             if (window.showElevatorModal) {
                 window.showElevatorModal();
@@ -222,13 +219,29 @@ FpsWalker.prototype.initialize = function () {
             }
         }
 
-        // 2. Room 9127
         if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
             if (window.portalTo9127) { window.portalTo9127(); return; }
             else { window.location.href = '../9127/'; return; }
         }
 
-        // 3. External link or standard URL
+        if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1) {
+            window.location.href = '../9422/'; return;
+        }
+
+        if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
+            window.location.href = '../9524/'; return;
+        }
+
+        if (url.indexOf('floor01') !== -1) {
+            if (window.portalToFloor01) { window.portalToFloor01(); return; }
+            else { window.location.href = '../floor01/'; return; }
+        }
+
+        if (url.indexOf('inside') !== -1) {
+            if (window.portalToInside) { window.portalToInside(); return; }
+            else { window.location.href = '../inside/'; return; }
+        }
+
         if (url.startsWith('http')) {
             window.open(url, '_blank');
             return;
@@ -238,35 +251,21 @@ FpsWalker.prototype.initialize = function () {
             return;
         }
 
-        // 4. จุด Hotspot เปล่า ที่ยังไม่ได้เชื่อมโยงไฟล์ (รอผู้ใช้นำไฟล์มาใส่ในภายหลัง)
-        console.log('[Hotspot] จุดเปล่า (รอเชื่อมต่อไฟล์):', name);
         var toast = document.getElementById('nav-arrival-toast');
         var toastText = document.getElementById('nav-arrival-text');
         if (toast && toastText) {
-            toastText.textContent = '📍 ' + (name || 'จุด Hotspot') + ' (ยังไม่ได้เชื่อมต่อไฟล์)';
-            toast.style.background = 'linear-gradient(135deg, rgba(30,41,59,0.96), rgba(15,23,42,0.96))';
-            toast.style.borderColor = '#38bdf8';
+            toastText.textContent = '📍 ' + (name || 'จุด Hotspot');
             toast.style.display = 'flex';
-            setTimeout(function () {
-                if (toast) {
-                    toast.style.display = 'none';
-                    toast.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.95),rgba(5,150,105,0.95))';
-                    toast.style.borderColor = '#6ee7b7';
-                }
-            }, 3000);
+            setTimeout(function () { if (toast) toast.style.display = 'none'; }, 3000);
         }
     }
 
-    // Helper to create or bind DOM element for a hotspot
     function createHotspotDom(hs) {
         var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || 
                          (hs.url && (hs.url.indexOf('elevator') !== -1 || hs.url === '#elevator')) || 
                          hs.id === 'hs_elevator_main';
         var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
-        
-        var rawIcon = hs.icon || '';
-        var isCorrupted = !rawIcon || rawIcon.indexOf('') !== -1 || rawIcon.indexOf('๐') !== -1 || rawIcon.length > 8;
-        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (isCorrupted ? '📍' : rawIcon);
+        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (hs.icon || '📍');
 
         var el = document.getElementById(hs.id);
         if (!el) {
@@ -311,7 +310,6 @@ FpsWalker.prototype.initialize = function () {
         return el;
     }
 
-    // Register / Unregister hooks for Admin Editor
     window._hotspotEditorRegister = function (data) {
         var existing = self.hotspots.find(function(h) { return h.id === data.id; });
         if (existing) return;
@@ -328,11 +326,7 @@ FpsWalker.prototype.initialize = function () {
             self.elevatorPos = new pc.Vec2(posX, posZ);
         }
 
-        var cleanIcon = data.icon || '';
-        if (isElevator) cleanIcon = '🛗';
-        else if (!cleanIcon || cleanIcon.indexOf('') !== -1 || cleanIcon.indexOf('๐') !== -1 || cleanIcon.length > 8) {
-            cleanIcon = '📍';
-        }
+        var cleanIcon = data.icon || (isElevator ? '🛗' : '📍');
 
         var hs = {
             id: data.id,
@@ -341,7 +335,7 @@ FpsWalker.prototype.initialize = function () {
             icon: cleanIcon,
             url: data.url || '#',
             worldPos: new pc.Vec3(posX, posY, posZ),
-            prox: data.prox || 3.0,
+            prox: data.prox || 4.0,
             action: function () {
                 if (isElevator && window.showElevatorModal) {
                     window.showElevatorModal();
@@ -360,7 +354,13 @@ FpsWalker.prototype.initialize = function () {
         if (el) el.remove();
     };
 
-    // Load custom hotspots from localStorage
+    // 1. Load Built-in Default Hotspots
+    var defaultList = [{"id":"hs_9127","name":"ห้อง 9127 (Computer Lab)","icon":"🚪","url":"../9127/","hint":"กด [E] หรือคลิกเพื่อเข้าห้อง","x":-26.087,"y":3.34,"z":-20.398,"prox":4},{"id":"hs_elevator_main","name":"ลิฟต์ชั้น 1","icon":"🛗","url":"#elevator","hint":"กด [E] หรือคลิกเพื่อเลือกชั้น","x":10.533,"y":3.34,"z":-2.68,"prox":4},{"id":"hs_inside_lobby","name":"โถงต้อนรับ ชั้น 1 (Main Lobby)","icon":"🏛️","url":"../inside/","hint":"กด [E] เพื่อไปโถงกลาง","x":-7.117,"y":3.34,"z":-3.903,"prox":4}];
+    defaultList.forEach(function(item) {
+        window._hotspotEditorRegister(item);
+    });
+
+    // 2. Load custom hotspots from localStorage
     try {
         var savedHs = localStorage.getItem('floor01_hotspots_v1');
         if (savedHs) {
@@ -373,12 +373,6 @@ FpsWalker.prototype.initialize = function () {
         }
     } catch (e) {}
 
-    // Init existing DOM elements for default hotspots
-    this.hotspots.forEach(function (hs) {
-        createHotspotDom(hs);
-    });
-
-    // Notify window that hotspot editor is ready
     window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
@@ -390,6 +384,54 @@ FpsWalker.prototype.rotateCamera = function (dx, dy) {
 };
 
 FpsWalker.prototype.update = function (dt) {
+
+        // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
+        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
+        if (!cam) {
+            var camEnt = this.entity.findByName('Camera');
+            if (camEnt) cam = camEnt.camera;
+        }
+
+        var camPos = this.entity.getPosition();
+        var camFwd = this.entity.forward;
+        var screenPos = new pc.Vec3();
+
+        for (var i = 0; i < this.hotspots.length; i++) {
+            var hs = this.hotspots[i];
+            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+            var el = hs.dom || document.getElementById(hs.id);
+
+            var proxDist = hs.prox || 4.0;
+            if (dist <= proxDist) {
+                if (app.keyboard.wasPressed(pc.KEY_E)) {
+                    if (typeof hs.trigger === 'function') hs.trigger();
+                    else if (typeof hs.action === 'function') hs.action();
+                }
+            }
+
+            if (el && cam) {
+                cam.worldToScreen(hs.worldPos, screenPos);
+                var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                var visibleDist = 35.0; // Visible up to 35 meters
+                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
+                    el.style.display = 'flex';
+                    el.style.left = Math.round(screenPos.x) + 'px';
+                    el.style.top = Math.round(screenPos.y) + 'px';
+                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    if (dist <= proxDist) {
+                        el.classList.add('near');
+                    } else {
+                        el.classList.remove('near');
+                    }
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        }
+    
     var app = this.app;
     var dtSec = dt || 0.016;
 

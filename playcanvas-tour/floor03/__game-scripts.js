@@ -332,6 +332,54 @@ FpsWalker.prototype.initialize = function () {
 };
 
 FpsWalker.prototype.update = function (dt) {
+
+        // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
+        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
+        if (!cam) {
+            var camEnt = this.entity.findByName('Camera');
+            if (camEnt) cam = camEnt.camera;
+        }
+
+        var camPos = this.entity.getPosition();
+        var camFwd = this.entity.forward;
+        var screenPos = new pc.Vec3();
+
+        for (var i = 0; i < this.hotspots.length; i++) {
+            var hs = this.hotspots[i];
+            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+            var el = hs.dom || document.getElementById(hs.id);
+
+            var proxDist = hs.prox || 4.0;
+            if (dist <= proxDist) {
+                if (app.keyboard.wasPressed(pc.KEY_E)) {
+                    if (typeof hs.trigger === 'function') hs.trigger();
+                    else if (typeof hs.action === 'function') hs.action();
+                }
+            }
+
+            if (el && cam) {
+                cam.worldToScreen(hs.worldPos, screenPos);
+                var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                var visibleDist = 35.0; // Visible up to 35 meters
+                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
+                    el.style.display = 'flex';
+                    el.style.left = Math.round(screenPos.x) + 'px';
+                    el.style.top = Math.round(screenPos.y) + 'px';
+                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    if (dist <= proxDist) {
+                        el.classList.add('near');
+                    } else {
+                        el.classList.remove('near');
+                    }
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        }
+    
     var dtSec = Math.min(dt, 0.1);
     var app = this.app;
 

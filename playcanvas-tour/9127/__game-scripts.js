@@ -27,6 +27,188 @@ FpsWalker.prototype._createProxyFloor = function (floorY) {
 };
 
 FpsWalker.prototype.initialize = function () {
+
+    // ─── Hotspot System & Admin Tool Integration ───
+    this.hotspots = [];
+
+    // Expose position to Admin Editor
+    window._hotspotEditorGetPos = function () {
+        var p = self.entity.getPosition();
+        return { x: p.x, y: p.y, z: p.z };
+    };
+
+    function handleHotspotAction(url, name, customAction) {
+        if (typeof customAction === 'function') {
+            customAction();
+            return;
+        }
+        url = url || '';
+        name = name || '';
+
+        var isElev = url === '#elevator' || url === '#modal' || (name && name.indexOf('ลิฟต์') !== -1);
+        if (isElev) {
+            if (window.showElevatorModal) {
+                window.showElevatorModal();
+                return;
+            }
+        }
+
+        if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
+            if (window.portalTo9127) { window.portalTo9127(); return; }
+            else { window.location.href = '../9127/'; return; }
+        }
+
+        if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1) {
+            window.location.href = '../9422/'; return;
+        }
+
+        if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
+            window.location.href = '../9524/'; return;
+        }
+
+        if (url.indexOf('floor01') !== -1) {
+            if (window.portalToFloor01) { window.portalToFloor01(); return; }
+            else { window.location.href = '../floor01/'; return; }
+        }
+
+        if (url.indexOf('inside') !== -1) {
+            if (window.portalToInside) { window.portalToInside(); return; }
+            else { window.location.href = '../inside/'; return; }
+        }
+
+        if (url.startsWith('http')) {
+            window.open(url, '_blank');
+            return;
+        }
+        if (url && url !== '#') {
+            window.location.href = url;
+            return;
+        }
+
+        var toast = document.getElementById('nav-arrival-toast');
+        var toastText = document.getElementById('nav-arrival-text');
+        if (toast && toastText) {
+            toastText.textContent = '📍 ' + (name || 'จุด Hotspot');
+            toast.style.display = 'flex';
+            setTimeout(function () { if (toast) toast.style.display = 'none'; }, 3000);
+        }
+    }
+
+    function createHotspotDom(hs) {
+        var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || 
+                         (hs.url && (hs.url.indexOf('elevator') !== -1 || hs.url === '#elevator')) || 
+                         hs.id === 'hs_elevator_main';
+        var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
+        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (hs.icon || '📍');
+
+        var el = document.getElementById(hs.id);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = hs.id;
+            el.className = 'hotspot-3d';
+            el.title = hs.name || 'Hotspot';
+            el.innerHTML = '<div class="hotspot-ring"></div>' +
+                           '<div class="hotspot-dot">' + iconHtml + '</div>' +
+                           '<div class="hotspot-label">' +
+                           '  <span class="hotspot-title">' + (hs.name || 'Hotspot') + '</span>' +
+                           '  <span class="hotspot-hint">' + hintText + '</span>' +
+                           '</div>';
+            document.body.appendChild(el);
+        } else {
+            var hintEl = el.querySelector('.hotspot-hint');
+            if (hintEl) hintEl.textContent = hintText;
+            var dotEl = el.querySelector('.hotspot-dot');
+            if (dotEl) dotEl.innerHTML = iconHtml;
+            var titleEl = el.querySelector('.hotspot-title');
+            if (titleEl) titleEl.textContent = hs.name || 'Hotspot';
+        }
+
+        function triggerHotspot(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (isElevator && window.showElevatorModal) {
+                window.showElevatorModal();
+                return;
+            }
+            handleHotspotAction(hs.url, hs.name, hs.action);
+        }
+
+        el.onclick = triggerHotspot;
+        el.onmousedown = function (e) { e.stopPropagation(); };
+        el.ontouchstart = function (e) { e.stopPropagation(); };
+
+        hs.dom = el;
+        hs.trigger = triggerHotspot;
+        return el;
+    }
+
+    window._hotspotEditorRegister = function (data) {
+        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
+        if (existing) return;
+
+        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
+        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
+        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
+
+        var isElevator = (data.name && data.name.indexOf('ลิฟต์') !== -1) || 
+                         (data.url && (data.url.indexOf('elevator') !== -1 || data.url === '#elevator')) || 
+                         data.id === 'hs_elevator_main';
+
+        if (isElevator) {
+            self.elevatorPos = new pc.Vec2(posX, posZ);
+        }
+
+        var cleanIcon = data.icon || (isElevator ? '🛗' : '📍');
+
+        var hs = {
+            id: data.id,
+            name: data.name || 'Hotspot',
+            hint: isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (data.hint || 'กด [E] หรือคลิกเพื่อเข้า'),
+            icon: cleanIcon,
+            url: data.url || '#',
+            worldPos: new pc.Vec3(posX, posY, posZ),
+            prox: data.prox || 4.0,
+            action: function () {
+                if (isElevator && window.showElevatorModal) {
+                    window.showElevatorModal();
+                    return;
+                }
+                handleHotspotAction(data.url, data.name, null);
+            }
+        };
+        createHotspotDom(hs);
+        self.hotspots.push(hs);
+    };
+
+    window._hotspotEditorUnregister = function (id) {
+        self.hotspots = self.hotspots.filter(function (h) { return h.id !== id; });
+        var el = document.getElementById(id);
+        if (el) el.remove();
+    };
+
+    // 1. Load Built-in Default Hotspots
+    var defaultList = [{"id":"hs_exit_9127","name":"🚪 ประตูทางออกสู่ชั้น 1 ด้านใน","icon":"🏢","url":"../floor01/","hint":"กด [E] หรือคลิกเพื่อออกไปทางเดินชั้น 1","x":0,"y":1.5,"z":4,"prox":4}];
+    defaultList.forEach(function(item) {
+        window._hotspotEditorRegister(item);
+    });
+
+    // 2. Load custom hotspots from localStorage
+    try {
+        var savedHs = localStorage.getItem('9127_hotspots_v1');
+        if (savedHs) {
+            var parsed = JSON.parse(savedHs);
+            if (Array.isArray(parsed)) {
+                parsed.forEach(function (item) {
+                    window._hotspotEditorRegister(item);
+                });
+            }
+        }
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
+    
     var self = this;
     var app  = this.app;
 
@@ -241,6 +423,54 @@ FpsWalker.prototype.initialize = function () {
 };
 
 FpsWalker.prototype.update = function (dt) {
+
+        // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
+        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
+        if (!cam) {
+            var camEnt = this.entity.findByName('Camera');
+            if (camEnt) cam = camEnt.camera;
+        }
+
+        var camPos = this.entity.getPosition();
+        var camFwd = this.entity.forward;
+        var screenPos = new pc.Vec3();
+
+        for (var i = 0; i < this.hotspots.length; i++) {
+            var hs = this.hotspots[i];
+            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+            var el = hs.dom || document.getElementById(hs.id);
+
+            var proxDist = hs.prox || 4.0;
+            if (dist <= proxDist) {
+                if (app.keyboard.wasPressed(pc.KEY_E)) {
+                    if (typeof hs.trigger === 'function') hs.trigger();
+                    else if (typeof hs.action === 'function') hs.action();
+                }
+            }
+
+            if (el && cam) {
+                cam.worldToScreen(hs.worldPos, screenPos);
+                var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                var visibleDist = 35.0; // Visible up to 35 meters
+                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
+                    el.style.display = 'flex';
+                    el.style.left = Math.round(screenPos.x) + 'px';
+                    el.style.top = Math.round(screenPos.y) + 'px';
+                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    if (dist <= proxDist) {
+                        el.classList.add('near');
+                    } else {
+                        el.classList.remove('near');
+                    }
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        }
+    
     var app   = this.app;
     var dtSec = dt || 0.016;
 
