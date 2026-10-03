@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta name='viewport'
+        content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
+    <meta charset='utf-8'>
+    <title>Virtual Tour — อาคารวิทยวิภาส (SC.09) | ชั้น 1 ด้านใน (Floor 01)</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style></style>
+    <link rel="manifest" href="manifest.json">
+    
+    <script src="playcanvas-stable.min.js"></script>
+    <script src="__settings__.js"></script>
+
+    <!-- Dropdown Interaction Script -->
+    <script>
+        window.toggleFloorDropdown = function (e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var wrap = document.getElementById('hudFloorDropdown');
+            if (wrap) {
+                wrap.classList.toggle('open');
+                document.body.classList.toggle('floor-menu-open', wrap.classList.contains('open'));
+            }
+        };
+        window.addEventListener('click', function (e) {
+            var wrap = document.getElementById('hudFloorDropdown');
+            if (wrap && !wrap.contains(e.target)) {
+                wrap.classList.remove('open');
+                document.body.classList.remove('floor-menu-open');
+            }
+        });
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                var wrap = document.getElementById('hudFloorDropdown');
+                if (wrap) wrap.classList.remove('open');
+                document.body.classList.remove('floor-menu-open');
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+    <!-- Portal Transition Fade Overlay -->
+    <div id="portal-fade"></div>
+
+    <!-- Custom Loading Screen Layer -->
+    <div id="loading-screen">
+        <div class="bg-image"></div>
+        <div class="bg-overlay"></div>
+
+        <div class="card">
+            <div class="logo-wrap">
+                <div class="logo-ring-2"></div>
+                <div class="logo-ring"></div>
+                <img class="logo" src="assets/images/logo.png" alt="College of Computing KKU">
+            </div>
+
+            <p class="badge">Virtual Tour · Indoor Corridor</p>
+            <h1 class="title-th">
+                อาคารวิทยวิภาส <span class="highlight">(ชั้น 1 ด้านใน)</span>
+            </h1>
+            <div class="divider"></div>
+            <p class="subtitle">
+                วิทยาลัยการคอมพิวเตอร์<br />
+                มหาวิทยาลัยขอนแก่น
+            </p>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-text" id="progress-text">กำลังโหลดชั้น 1 ด้านใน...</span>
+                    <span class="progress-pct" id="progress-pct">0%</span>
+                </div>
+            </div>
+
+            <p class="tip" id="tip-text">
+                เม้าส์เพื่อหันมอง · ปุ่ม W, A, S, D เพื่อเดินสำรวจ
+            </p>
+
+            <button id="enter-btn">
+                เข้าสู่ชั้น 1 ด้านใน (Enter Floor 01)
+            </button>
+        </div>
+    </div>
+
+    <!-- In-Tour HUD -->
+    <div id="tour-hud">
+        <div class="hud-top-left">
+            <img class="hud-logo" src="assets/images/logo.png" alt="Logo">
+            <div class="hud-title-wrap">
+                <h2>อาคารวิทยวิภาส (SC.09)</h2>
+                <p>ชั้น 1 ด้านใน (Floor 01) · วิทยาลัยการคอมพิวเตอร์ มข.</p>
+            </div>
+        </div>
+
+        <div class="hud-top-right">
+            <!-- Floor Selection Dropdown (Human-Crafted Minimal) -->
+            <div class="hud-dropdown-wrap" id="hudFloorDropdown">
+                <button class="hud-btn hud-btn-dropdown" onclick="toggleFloorDropdown(event)"
+                    title="เลือกชั้น / จุดสำรวจ">
+
+                    <span class="hud-btn-label">ชั้น 1 ด้านใน</span>
+                    <svg class="hud-caret" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                        <path fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+                                <div class="hud-dropdown-menu">
+                    <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
+                    <a href="../" class="hud-menu-item">
+                        <span class="hud-menu-icon">🏛️</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
+                            <span class="hud-menu-sub">ทางเข้าด้านหน้าอาคาร SC.09</span>
+                        </div>
+                    </a>
+                    <a href="../inside/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🚪</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
+                            <span class="hud-menu-sub">โถงกลางหน้าลิฟต์</span>
+                        </div>
+                    </a>
+                    <a href="./" class="hud-menu-item current">
+                        <span class="hud-menu-icon">🏢</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 01)</span>
+                        </div>
+                        <span class="hud-current-badge">ตำแหน่งนี้</span>
+                    </a>
+                    <a href="../floor02/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🛋️</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 2</span>
+                            <span class="hud-menu-sub">ห้องสมุด & Student Lounge</span>
+                        </div>
+                    </a>
+                    <a href="../floor03/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🔬</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 3</span>
+                            <span class="hud-menu-sub">ห้องเรียน & ห้องปฏิบัติการ</span>
+                        </div>
+                    </a>
+                    <a href="../floor04/" class="hud-menu-item">
+                        <span class="hud-menu-icon">📚</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 4</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 04)</span>
+                        </div>
+                    </a>
+                    <a href="../floor05/" class="hud-menu-item">
+                        <span class="hud-menu-icon">💻</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 5</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 05)</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Utility Buttons -->
+            <button class="hud-btn" id="btn-nav-guide" onclick="window.toggleNavMenu && window.toggleNavMenu();" title="ระบบนำทางไปยังจุดต่างๆ (Navigate)" style="background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(2,132,199,0.35)); border-color:rgba(56,189,248,0.5);">
+                <span>🧭</span>
+                <span>นำทาง</span>
+            </button>
+            <a href="../map/" class="hud-btn" title="เปิดแผนที่อาคาร 3D">
+
+                <span>แผนที่ 3D</span>
+            </a>
+            <button class="hud-btn" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)">
+                <span>📍</span>
+                <span>Hotspot</span>
+            </button>
+            <button class="hud-btn" id="btn-reset-cam" title="รีเซ็ตตำแหน่งเริ่มต้น">
+                <span>🔄</span>
+                <span>รีเซ็ต</span>
+            </button>
+            <button class="hud-btn" id="btn-fullscreen" title="แสดงเต็มจอ">
+                <span>⛶</span>
+            </button>
+        </div>
+
+
+
+        <!-- Elevator Prompt Banner (E key near elevator) -->
+        <div id="elevator-prompt" class="elevator-prompt-bar">
+            <span>🛗</span>
+            <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 2, 3, 4, 5)</span>
+        </div>
+
+        <!-- Elevator Floor Selector Modal -->
+        <div id="elevator-modal" class="elevator-modal-overlay">
+            <div class="elevator-modal-card">
+                <div class="elevator-modal-icon">🛗</div>
+                <h3 class="elevator-modal-title">ลิฟต์อาคาร SC.09</h3>
+                <p class="elevator-modal-sub">คุณอยู่ที่: ชั้น 1 ด้านใน (Floor 01)
+                </p>
+                <div class="elevator-modal-list">
+                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor05 && window.portalToFloor05();"
+                        >
+                        🔺 ขึ้นชั้น 5 (Floor 05)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor04 && window.portalToFloor04();"
+                        >
+                        🔺 ขึ้นชั้น 4 (Floor 04)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor03 && window.portalToFloor03();"
+                        >
+                        🔺 ขึ้นชั้น 3 (Floor 03)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor02 && window.portalToFloor02();"
+                        >
+                        🔺 ขึ้นชั้น 2 (Floor 02)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToInside && window.portalToInside();"
+                        >
+                        🏛️ โถงกลางชั้น 1 (Main Lobby)
+                    </button>
+                </div>
+                <button class="elevator-modal-close" onclick="document.getElementById('elevator-modal').style.display='none';">✕ ปิดหน้าต่าง</button>
+            </div>
+        </div>
+
+        <div class="hud-floor-badge">
+            <span>🚪</span>
+            <span>ชั้น 1 ด้านใน (Floor 01)</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- HOTSPOT ADMIN EDITOR — Press Ctrl+H to open -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="hotspot-editor" class="hs-editor-panel">
+
+        <!-- Panel Header -->
+        <div class="hs-panel-header">
+            <div>
+                <div class="hs-panel-title">📍 Hotspot Editor</div>
+                <div class="hs-panel-subtitle">Admin Tool — กด Ctrl+H เพื่อเปิด/ปิด</div>
+            </div>
+            <button onclick="window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
+        </div>
+
+        <!-- Current Position Box -->
+        <div class="hs-pos-box">
+            <div class="hs-section-label">📡 ตำแหน่งผู้เล่นปัจจุบัน</div>
+            <div id="hs-live-pos" class="hs-pos-display">x: — &nbsp; y: — &nbsp; z: —</div>
+            <button id="hs-capture-btn" class="hs-btn-capture" onclick="window.hotspotEditorCapture()">
+                📍 วางจุด Hotspot ที่ตำแหน่งนี้
+            </button>
+        </div>
+
+        <!-- Add Hotspot Form -->
+        <div id="hs-form" class="hs-form-box">
+            <div class="hs-form-title">⚙️ ตั้งค่า Hotspot ใหม่</div>
+            <div class="hs-form-grid">
+                <div>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ชื่อห้อง / จุด</label>
+                    <input id="hs-name" type="text" placeholder="เช่น ห้อง 9127" class="hs-input">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">คำอธิบาย (hint)</label>
+                    <input id="hs-hint" type="text" placeholder="เช่น กด E เพื่อเข้าห้อง" class="hs-input">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">Icon (emoji)</label>
+                    <input id="hs-icon" type="text" value="🚪" class="hs-input">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">URL ปลายทาง</label>
+                    <input id="hs-url" type="text" placeholder="เช่น ../9127/" class="hs-input">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ระยะใกล้ Prompt (หน่วย: m)</label>
+                    <input id="hs-prox" type="number" value="3" step="0.5" min="0.5" class="hs-input">
+                </div>
+                <div style="display:flex; gap:8px; margin-top:4px;">
+                    <button onclick="window.hotspotEditorSave()" class="hs-btn-save">✅ บันทึก</button>
+                    <button onclick="window.hotspotEditorCancelForm()" class="hs-btn-cancel">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hotspot List -->
+        <div class="hs-list-section">
+            <div class="hs-section-label">📋 รายการ Hotspots</div>
+            <div id="hs-list">
+                <div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="hs-export-section">
+            <button onclick="window.hotspotEditorExport()" class="hs-btn-export">
+                📋 Copy Code เพื่อนำไปใช้
+            </button>
+            <div id="hs-export-box" class="hs-export-box">
+                <textarea id="hs-export-text" readonly class="hs-export-textarea"></textarea>
+                <div class="hs-export-hint">✅ คัดลอก Code นี้ไปแทนที่ใน __game-scripts.js</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hotspot Editor Toggle Button (floating) -->
+    <button id="hs-editor-toggle-btn"
+        onclick="window.toggleHotspotEditor()"
+        title="เปิด Hotspot Editor (Ctrl+H)"
+        class="hs-toggle-btn">
+        📍
+    </button>
+
+    <script src="__modules__.js"></script>
+    <script src="__start__.js"></script>
+    <script src="__loading__.js"></script>
+    <script src="../nav-guide.js"></script>
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    // HOTSPOT ADMIN EDITOR — Client-side JS
+    // ═══════════════════════════════════════════════════════════
+    (function() {
+        var editorOpen = false;
+        var pendingPos = null;
+        var hotspots = [];
+        var STORAGE_KEY = 'floor01_hotspots_v1';
+
+                // Load from localStorage & sanitize broken icons
+        try {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                hotspots = JSON.parse(saved);
+                if (Array.isArray(hotspots)) {
+                    var modified = false;
+                    hotspots.forEach(function(h) {
+                        var isElev = h.name && h.name.indexOf('ลิฟต์') !== -1;
+                        if (!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1 || h.icon.length > 8) {
+                            h.icon = isElev ? '🛗' : '📍';
+                            modified = true;
+                        }
+                    });
+                    if (modified) saveToStorage();
+                }
+            }
+        } catch(e) {}
+
+        function saveToStorage() {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch(e) {}
+        }
+
+        window.toggleHotspotEditor = function() {
+            editorOpen = !editorOpen;
+            var panel = document.getElementById('hotspot-editor');
+            var btn   = document.getElementById('hs-editor-toggle-btn');
+            if (panel) panel.style.display = editorOpen ? 'flex' : 'none';
+            if (btn)   btn.style.display   = editorOpen ? 'none' : 'flex';
+            if (editorOpen) renderList();
+        };
+
+        // Show toggle button when HUD is visible
+        window.addEventListener('hotspot-editor-ready', function() {
+            var btn = document.getElementById('hs-editor-toggle-btn');
+            if (btn) btn.style.display = 'flex';
+        });
+
+        // Ctrl+H to toggle
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                window.toggleHotspotEditor();
+            }
+        });
+
+        // Capture player position
+        window.hotspotEditorCapture = function() {
+            if (window._hotspotEditorGetPos) {
+                pendingPos = window._hotspotEditorGetPos();
+            } else {
+                // Fallback: ask user manually
+                var coords = prompt('ยังไม่ได้เชื่อมต่อกับ PlayCanvas\nกรอก position เอง (x,y,z):','0,3,0');
+                if (!coords) return;
+                var parts = coords.split(',').map(Number);
+                pendingPos = { x: parts[0]||0, y: parts[1]||3, z: parts[2]||0 };
+            }
+            if (!pendingPos) return;
+            document.getElementById('hs-form').style.display = 'block';
+            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
+            document.getElementById('hs-capture-btn').textContent = '✅ ตำแหน่งถูกบันทึก — กรอกข้อมูลด้านล่าง';
+        };
+
+        window.hotspotEditorCancelForm = function() {
+            pendingPos = null;
+            document.getElementById('hs-form').style.display = 'none';
+            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
+            document.getElementById('hs-capture-btn').textContent = '📍 วางจุด Hotspot ที่ตำแหน่งนี้';
+        };
+
+        window.hotspotEditorSave = function() {
+            if (!pendingPos) { alert('กด "วางจุด Hotspot" ก่อนนะครับ'); return; }
+            var name  = document.getElementById('hs-name').value.trim()  || 'Hotspot';
+            var hint  = document.getElementById('hs-hint').value.trim()  || 'คลิกเพื่อเข้า';
+            var icon  = document.getElementById('hs-icon').value.trim()  || '🚪';
+            var url   = document.getElementById('hs-url').value.trim()   || '#';
+            var prox  = parseFloat(document.getElementById('hs-prox').value) || 3;
+
+            var hs = {
+                id: 'hs_' + Date.now(),
+                name: name, hint: hint, icon: icon, url: url, prox: prox,
+                pos: { x: +pendingPos.x.toFixed(3), y: +pendingPos.y.toFixed(3), z: +pendingPos.z.toFixed(3) }
+            };
+            hotspots.push(hs);
+            saveToStorage();
+
+            // Register with runtime if available
+            if (window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
+
+            hotspotEditorCancelForm();
+            document.getElementById('hs-name').value = '';
+            document.getElementById('hs-hint').value = '';
+            document.getElementById('hs-url').value  = '';
+            renderList();
+        };
+
+        window.hotspotEditorDelete = function(id) {
+            hotspots = hotspots.filter(function(h){ return h.id !== id; });
+            saveToStorage();
+            if (window._hotspotEditorUnregister) window._hotspotEditorUnregister(id);
+            renderList();
+        };
+
+        window.hotspotEditorExport = function() {
+            var lines = hotspots.map(function(h) {
+                return '    {\n' +
+                    '        id: \'' + h.id + '\',\n' +
+                    '        worldPos: new pc.Vec3(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + '),\n' +
+                    '        label: \'' + h.name + '\',\n' +
+                    '        hint:  \'' + h.hint + '\',\n' +
+                    '        icon:  \'' + h.icon + '\',\n' +
+                    '        url:   \'' + h.url  + '\',\n' +
+                    '        prox:  ' + h.prox + '\n' +
+                    '    }';
+            });
+            var code = '// === วางใน __game-scripts.js ===\nvar DYNAMIC_HOTSPOTS = [\n' + lines.join(',\n') + '\n];';
+            var box = document.getElementById('hs-export-box');
+            var txt = document.getElementById('hs-export-text');
+            if (txt) txt.value = code;
+            if (box) box.style.display = 'block';
+            try { txt.select(); document.execCommand('copy'); } catch(e) {}
+        };
+
+        function renderList() {
+            var el = document.getElementById('hs-list');
+            if (!el) return;
+            if (hotspots.length === 0) {
+                el.innerHTML = '<div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>';
+                return;
+            }
+            el.innerHTML = hotspots.map(function(h, i) {
+                return '<div class="hs-item-card">' +
+                    '<div class="hs-item-row">' +
+                    '<div>' +
+                    '<div class="hs-item-title">' + ((!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1) ? ((h.name && h.name.indexOf('ลิฟต์') !== -1) ? '🛗' : '📍') : h.icon) + ' ' + (h.name || 'Hotspot') + '</div>' +
+                    '<div class="hs-item-pos">x:' + h.pos.x + ' y:' + h.pos.y + ' z:' + h.pos.z + '</div>' +
+                    '<div class="hs-item-url">→ ' + h.url + ' (Prox: ' + h.prox + 'm)</div>' +
+                    '</div>' +
+                    '<button onclick="window.hotspotEditorDelete(\'' + h.id + '\')" class="hs-item-delete-btn">🗑️</button>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // Update live position display (called from game loop)
+        setInterval(function() {
+            var el = document.getElementById('hs-live-pos');
+            if (!el || !editorOpen) return;
+            if (window._hotspotEditorGetPos) {
+                var p = window._hotspotEditorGetPos();
+                el.textContent = 'x: ' + p.x.toFixed(2) + '   y: ' + p.y.toFixed(2) + '   z: ' + p.z.toFixed(2);
+            }
+        }, 200);
+
+        renderList();
+    })();
+    </script>
+</body>
+
+</html>

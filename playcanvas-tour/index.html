@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
+    <meta charset='utf-8'>
+    <title>Virtual Tour — อาคารวิทยวิภาส (SC.09) | วิทยาลัยการคอมพิวเตอร์ มข.</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <style></style>
+    <script src="playcanvas-stable.min.js"></script>
+    <script src="__settings__.js"></script>
+
+    <!-- Dropdown Interaction Script -->
+    <script>
+    window.toggleFloorDropdown = function(e) {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+        var wrap = document.getElementById('hudFloorDropdown');
+        if (wrap) {
+            wrap.classList.toggle('open');
+        }
+    };
+    window.addEventListener('click', function(e) {
+        var wrap = document.getElementById('hudFloorDropdown');
+        if (wrap && !wrap.contains(e.target)) {
+            wrap.classList.remove('open');
+        }
+    });
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            var wrap = document.getElementById('hudFloorDropdown');
+            if (wrap) wrap.classList.remove('open');
+        }
+    });
+    </script>
+
+</head>
+<body>
+    <!-- Custom Loading Screen Layer -->
+    <div id="loading-screen">
+        <div class="bg-image"></div>
+        <div class="bg-overlay"></div>
+
+        <div class="card">
+            <div class="logo-wrap">
+                <div class="logo-ring-2"></div>
+                <div class="logo-ring"></div>
+                <img class="logo" src="assets/images/logo.png" alt="College of Computing KKU">
+            </div>
+
+            <p class="badge">Virtual Tour · PlayCanvas Engine</p>
+            <h1 class="title-th">
+                อาคาร<span class="highlight">วิทยวิภาส (SC.09)</span>
+            </h1>
+            <div class="divider"></div>
+            <p class="subtitle">
+                วิทยาลัยการคอมพิวเตอร์<br/>
+                มหาวิทยาลัยขอนแก่น
+            </p>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-text" id="progress-text">กำลังโหลดฉากจำลองอาคาร...</span>
+                    <span class="progress-pct" id="progress-pct">0%</span>
+                </div>
+            </div>
+
+            <p class="tip" id="tip-text">
+                🖱️ เม้าส์เพื่อหันมอง · ปุ่ม W, A, S, D เพื่อเดินสำรวจ
+            </p>
+
+            <button id="enter-btn">
+                🏛️ เข้าชมอาคาร (Enter Tour)
+            </button>
+        </div>
+    </div>
+
+    <!-- Portal Transition Fade Overlay -->
+    <div id="portal-fade"></div>
+
+    <!-- Door Prompt Banner -->
+    <div id="door-prompt" onclick="window.portalToInside && window.portalToInside()">
+        <span>🚪</span>
+        <span id="door-prompt-text">กด [E] หรือคลิกตรงนี้เพื่อเข้าสู่โถงชั้น 1</span>
+    </div>
+
+    <!-- In-Tour HUD -->
+    <div id="tour-hud">
+        <div class="hud-top-left">
+            <img class="hud-logo" src="assets/images/logo.png" alt="Logo">
+            <div class="hud-title-wrap">
+                <h2>อาคารวิทยวิภาส (SC.09)</h2>
+                <p>วิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น</p>
+            </div>
+        </div>
+
+                <div class="hud-top-right">
+            <!-- Floor Selection Dropdown (Human-Crafted Minimal) -->
+            <div class="hud-dropdown-wrap" id="hudFloorDropdown">
+                <button class="hud-btn hud-btn-dropdown" onclick="toggleFloorDropdown(event)" title="เลือกชั้น / จุดสำรวจ">
+                    <span class="hud-btn-icon">🏛️</span>
+                    <span class="hud-btn-label">หน้าตึก (ภายนอก)</span>
+                    <svg class="hud-caret" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                                <div class="hud-dropdown-menu">
+                    <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
+                    <a href="./" class="hud-menu-item current">
+                        <span class="hud-menu-icon">🏛️</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
+                            <span class="hud-menu-sub">ทางเข้าด้านหน้าอาคาร SC.09</span>
+                        </div>
+                        <span class="hud-current-badge">ตำแหน่งนี้</span>
+                    </a>
+                    <a href="inside/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🚪</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
+                            <span class="hud-menu-sub">โถงกลางหน้าลิฟต์</span>
+                        </div>
+                    </a>
+                    <a href="floor01/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🏢</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 01)</span>
+                        </div>
+                    </a>
+                    <a href="floor02/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🛋️</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 2</span>
+                            <span class="hud-menu-sub">ห้องสมุด & Student Lounge</span>
+                        </div>
+                    </a>
+                    <a href="floor03/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🔬</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 3</span>
+                            <span class="hud-menu-sub">ห้องเรียน & ห้องปฏิบัติการ</span>
+                        </div>
+                    </a>
+                    <a href="floor04/" class="hud-menu-item">
+                        <span class="hud-menu-icon">📚</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 4</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 04)</span>
+                        </div>
+                    </a>
+                    <a href="floor05/" class="hud-menu-item">
+                        <span class="hud-menu-icon">💻</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">ชั้น 5</span>
+                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 05)</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Utility Buttons -->
+            <a href="map/" class="hud-btn" title="เปิดแผนที่อาคาร 3D">
+                <span>🗺️</span>
+                <span>แผนที่ 3D</span>
+            </a>
+            <button class="hud-btn" id="btn-reset-cam" title="รีเซ็ตตำแหน่งเริ่มต้น">
+                <span>🔄</span>
+                <span>รีเซ็ต</span>
+            </button>
+            <button class="hud-btn" id="btn-fullscreen" title="แสดงเต็มจอ">
+                <span>⛶</span>
+            </button>
+        </div>
+
+
+
+        <div class="hud-floor-badge">
+            <span>🏢</span>
+            <span>อาคาร SC.09 หน้าตึก</span>
+        </div>
+    </div>
+
+    <script src="__modules__.js"></script>
+    <script src="__start__.js"></script>
+    <script src="__loading__.js"></script>
+</body>
+</html>
