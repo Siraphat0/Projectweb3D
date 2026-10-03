@@ -18,7 +18,6 @@ FirstPersonController.prototype.initialize = function () {
     this.lastY = 0;
 
     var self = this;
-    window._activeWalker = this;
 
     // ─── 1. Model Tilt Correction (applied to model in World Space) ───
     var splatEntity = this.app.root.findByName('C1.sog');
@@ -244,209 +243,6 @@ FirstPersonController.prototype.initialize = function () {
     window.addEventListener('touchend', function () {
         self.isDragging = false;
     });
-
-    // ─── Hotspot System & Admin Tool Integration — Inside (Main Lobby) ───
-    this.hotspots = [];
-
-    window._hotspotEditorGetPos = function () {
-        var p = self.entity.getPosition();
-        return { x: p.x, y: p.y, z: p.z };
-    };
-
-    // Central Hotspot Action & Portal Router
-    function handleHotspotAction(url, name, customAction) {
-        if (typeof customAction === 'function') {
-            customAction();
-            return;
-        }
-        url = url || '';
-        name = name || '';
-
-        // 1. Elevator modal triggers: ONLY when url is '#elevator' or '#modal' or if name is specifically elevator
-        if (url === '#elevator' || url === '#modal' || (url === '' && name.indexOf('ลิฟต์') !== -1)) {
-            if (window.showElevatorModal) {
-                window.showElevatorModal();
-                return;
-            }
-        }
-
-        // 2. Floor 01 (ทางเข้าชั้น 1 ด้านใน / ประตูทางเข้าชั้น1)
-        if (url.indexOf('floor01') !== -1 || name.indexOf('ชั้น1') !== -1 || name.indexOf('ชั้น 1') !== -1 || name.indexOf('ทางเข้าชั้น') !== -1) {
-            if (window.portalToFloor01) { window.portalToFloor01(); return; }
-            else { window.location.href = '../floor01/'; return; }
-        }
-
-        // 3. Room 9127
-        if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
-            if (window.portalTo9127) { window.portalTo9127(); return; }
-            else { window.location.href = '../9127/'; return; }
-        }
-
-        // 4. Room 9524
-        if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
-            if (window.portalTo9524) { window.portalTo9524(); return; }
-            else { window.location.href = '../9524/'; return; }
-        }
-
-        // 5. Room 9422
-        if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1) {
-            if (window.portalTo9422) { window.portalTo9422(); return; }
-            else { window.location.href = '../9422/'; return; }
-        }
-
-        // 6. Floor 05
-        if (url.indexOf('floor05') !== -1 || name.indexOf('ชั้น 5') !== -1 || name.indexOf('ชั้น5') !== -1) {
-            if (window.portalToFloor05) { window.portalToFloor05(); return; }
-            else { window.location.href = '../floor05/'; return; }
-        }
-
-        // 7. External link or standard URL
-        if (url.startsWith('http')) {
-            window.open(url, '_blank');
-            return;
-        }
-        if (url && url !== '#') {
-            window.location.href = url;
-            return;
-        }
-
-        // 4. จุด Hotspot เปล่า ที่ยังไม่ได้เชื่อมโยงไฟล์ (รอผู้ใช้นำไฟล์มาใส่ในภายหลัง)
-        console.log('[Hotspot] จุดเปล่า (รอเชื่อมต่อไฟล์):', name);
-        var toast = document.getElementById('nav-arrival-toast');
-        var toastText = document.getElementById('nav-arrival-text');
-        if (toast && toastText) {
-            toastText.textContent = '📍 ' + (name || 'จุด Hotspot') + ' (ยังไม่ได้เชื่อมต่อไฟล์)';
-            toast.style.background = 'linear-gradient(135deg, rgba(30,41,59,0.96), rgba(15,23,42,0.96))';
-            toast.style.borderColor = '#38bdf8';
-            toast.style.display = 'flex';
-            setTimeout(function () {
-                if (toast) {
-                    toast.style.display = 'none';
-                    toast.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.95),rgba(5,150,105,0.95))';
-                    toast.style.borderColor = '#6ee7b7';
-                }
-            }, 3000);
-        }
-    }
-
-    function createHotspotDom(hs) {
-        var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || 
-                         (hs.url && (hs.url.indexOf('elevator') !== -1 || hs.url === '#elevator')) || 
-                         hs.id === 'hs_elevator_main';
-        var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
-        
-        var rawIcon = hs.icon || '';
-        var isCorrupted = !rawIcon || rawIcon.indexOf('') !== -1 || rawIcon.indexOf('๐') !== -1 || rawIcon.length > 8;
-        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (isCorrupted ? '📍' : rawIcon);
-
-        var el = document.getElementById(hs.id);
-        if (!el) {
-            el = document.createElement('div');
-            el.id = hs.id;
-            el.className = 'hotspot-3d';
-            el.title = hs.name || 'Hotspot';
-            el.innerHTML = '<div class="hotspot-ring"></div>' +
-                           '<div class="hotspot-dot">' + iconHtml + '</div>' +
-                           '<div class="hotspot-label">' +
-                           '  <span class="hotspot-title">' + (hs.name || 'Hotspot') + '</span>' +
-                           '  <span class="hotspot-hint">' + hintText + '</span>' +
-                           '</div>';
-            document.body.appendChild(el);
-        } else {
-            var hintEl = el.querySelector('.hotspot-hint');
-            if (hintEl) hintEl.textContent = hintText;
-            var dotEl = el.querySelector('.hotspot-dot');
-            if (dotEl) dotEl.innerHTML = iconHtml;
-            var titleEl = el.querySelector('.hotspot-title');
-            if (titleEl) titleEl.textContent = hs.name || 'Hotspot';
-        }
-
-        function triggerHotspot(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            if (isElevator && window.showElevatorModal) {
-                window.showElevatorModal();
-                return;
-            }
-            handleHotspotAction(hs.url, hs.name, hs.action);
-        }
-
-        el.onclick = triggerHotspot;
-        el.onmousedown = function (e) { e.stopPropagation(); };
-        el.ontouchstart = function (e) { e.stopPropagation(); };
-
-        hs.dom = el;
-        hs.trigger = triggerHotspot;
-        return el;
-    }
-
-    window._hotspotEditorRegister = function (data) {
-        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
-        if (existing) return;
-
-        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
-        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
-        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
-
-        var isElevator = (data.name && data.name.indexOf('ลิฟต์') !== -1) || 
-                         (data.url && (data.url.indexOf('elevator') !== -1 || data.url === '#elevator')) || 
-                         data.id === 'hs_elevator_main';
-
-        if (isElevator) {
-            self.elevatorPos = new pc.Vec2(posX, posZ);
-        }
-
-        var cleanIcon = data.icon || '';
-        if (isElevator) cleanIcon = '🛗';
-        else if (!cleanIcon || cleanIcon.indexOf('') !== -1 || cleanIcon.indexOf('๐') !== -1 || cleanIcon.length > 8) {
-            cleanIcon = '📍';
-        }
-
-        var hs = {
-            id: data.id,
-            name: data.name || 'Hotspot',
-            hint: isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (data.hint || 'กด [E] หรือคลิกเพื่อเข้า'),
-            icon: cleanIcon,
-            url: data.url || '#',
-            worldPos: new pc.Vec3(posX, posY, posZ),
-            prox: data.prox || 3.0,
-            action: function () {
-                if (isElevator && window.showElevatorModal) {
-                    window.showElevatorModal();
-                    return;
-                }
-                handleHotspotAction(data.url, data.name, null);
-            }
-        };
-        createHotspotDom(hs);
-        self.hotspots.push(hs);
-    };
-
-    window._hotspotEditorUnregister = function (id) {
-        self.hotspots = self.hotspots.filter(function (h) { return h.id !== id; });
-        var el = document.getElementById(id);
-        if (el) el.remove();
-    };
-
-    try {
-        var saved = localStorage.getItem('inside_hotspots_v1');
-        if (saved) {
-            var list = JSON.parse(saved);
-            if (Array.isArray(list)) {
-                list.forEach(function (item) {
-                    window._hotspotEditorRegister(item);
-                });
-            }
-        }
-    } catch (e) {}
-
-    this.hotspots.forEach(function (hs) {
-        createHotspotDom(hs);
-    });
-
-    window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
 FirstPersonController.prototype.rotateCamera = function (dx, dy) {
@@ -477,30 +273,29 @@ FirstPersonController.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
 
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
     if (isSprinting) {
-        targetSpeed *= 1.7;
+        targetSpeed *= 1.7; // ~9.8m/s
     }
 
     if (input.lengthSq() > 0) {
         input.normalize().scale(targetSpeed);
     }
 
-    var accelFactor = Math.min(1, dtSec * 10);
+    var accelFactor = Math.min(1, dtSec * 9);
     this.currentVelocity.lerp(this.currentVelocity, input, accelFactor);
 
     // ─── 3. Physics & Jump ───
     var isGrounded = false;
-    var pos = this.entity.getPosition();
-
     if (this.entity.rigidbody) {
         var vel = this.entity.rigidbody.linearVelocity;
         var yVel = vel ? vel.y : 0;
 
-        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.55, pos.z);
+        var pos = this.entity.getPosition();
+        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.52, pos.z);
         var hit = this.app.systems.rigidbody.raycastFirst(pos, rayEnd);
-        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.55));
+        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.52));
 
         if (isGrounded && app.keyboard.wasPressed(pc.KEY_SPACE)) {
             yVel = this.jumpForce || 4.5;
@@ -509,46 +304,16 @@ FirstPersonController.prototype.update = function (dt) {
         this.entity.rigidbody.linearVelocity = new pc.Vec3(this.currentVelocity.x, yVel, this.currentVelocity.z);
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
 
-        // ─── Hotspots & Proximity Triggers ───
-        var cam = (this.eyeEntity && this.eyeEntity.camera) ? this.eyeEntity.camera : 
-                  (this.cameraEntity && this.cameraEntity.camera ? this.cameraEntity.camera : 
-                  (this.entity.camera ? this.entity.camera : 
-                  (this.entity.findByName('Camera') ? this.entity.findByName('Camera').camera : null)));
-        var camFwd = this.eyeEntity ? this.eyeEntity.forward : this.entity.forward;
-        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
-        var screenPos = new pc.Vec3();
-
-        if (this.hotspots && this.hotspots.length > 0) {
-            for (var i = 0; i < this.hotspots.length; i++) {
-                var hs = this.hotspots[i];
-                if (!hs || !hs.worldPos) continue;
-                var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
-                var el = hs.dom || document.getElementById(hs.id);
-
-                var proxDist = hs.prox || 4.0;
-                if (dist <= proxDist) {
-                    if (app && app.keyboard && app.keyboard.wasPressed(pc.KEY_E)) {
-                        if (typeof hs.trigger === 'function') hs.trigger();
-                        else if (typeof hs.action === 'function') hs.action();
-                    }
+        // ─── 4. Doorway Trigger Check ───
+        var doorFloor01Prompt = document.getElementById('door-floor01-prompt');
+        if (doorFloor01Prompt) {
+            if (pos.z <= 0.5 || pos.x <= 7.5) {
+                if (doorFloor01Prompt.style.display !== 'flex') doorFloor01Prompt.style.display = 'flex';
+                if (app.keyboard.wasPressed(pc.KEY_E)) {
+                    if (window.portalToFloor01) window.portalToFloor01();
                 }
-
-                if (el && cam) {
-                    cam.worldToScreen(hs.worldPos, screenPos);
-                    var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                    var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                    var visibleDist = 35.0;
-                    if (dist <= visibleDist && dot > 0.05 && screenPos.z > 0) {
-                        el.style.display = 'flex';
-                        el.style.left = Math.round(screenPos.x) + 'px';
-                        el.style.top = Math.round(screenPos.y) + 'px';
-                        var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
-                        el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                    } else {
-                        el.style.display = 'none';
-                    }
-                }
+            } else {
+                if (doorFloor01Prompt.style.display === 'flex') doorFloor01Prompt.style.display = 'none';
             }
         }
     } else {
@@ -556,7 +321,7 @@ FirstPersonController.prototype.update = function (dt) {
         isGrounded = true;
     }
 
-    // ─── 4. Realistic Human Head Bobbing, Breathing & Footsteps ───
+    // ─── 5. Realistic Human Head Bobbing, Breathing & Footsteps ───
     var moveSpeed = this.currentVelocity.length();
     var isMoving = (moveSpeed > 0.4) && isGrounded;
     var stepRate = isSprinting ? 12.0 : 8.8;
@@ -569,21 +334,33 @@ FirstPersonController.prototype.update = function (dt) {
     }
 
     this.breathTimer += dtSec;
+
+    // Vertical dip on each step (inverted pendulum kinematics)
     var stepPhase = Math.sin(this.bobTimer);
     var bobY = -Math.abs(Math.sin(this.bobTimer)) * (isSprinting ? 0.045 : 0.030) * this.bobWeight;
+
+    // Horizontal head sway (left/right foot weight shift)
     var bobX = Math.cos(this.bobTimer * 0.5) * (isSprinting ? 0.022 : 0.015) * this.bobWeight;
+
+    // Idle breathing (gentle 8mm chest rise and fall when stationary)
     var breathY = Math.sin(this.breathTimer * 1.5) * 0.008 * (1.0 - this.bobWeight);
+
+    // Subtle head tilt / banking when strafing
     var strafeAmount = (app.keyboard.isPressed(pc.KEY_A) ? 1 : 0) - (app.keyboard.isPressed(pc.KEY_D) ? 1 : 0);
     var bankRoll = strafeAmount * (isSprinting ? 0.8 : 0.45) * this.bobWeight;
     var headPitch = Math.sin(this.bobTimer) * (isSprinting ? 0.5 : 0.3) * this.bobWeight;
 
+    // Apply smooth local offsets to eye entity
     if (this.eyeEntity) {
         this.eyeEntity.setLocalPosition(bobX, bobY + breathY, 0);
         this.eyeEntity.setLocalEulerAngles(headPitch, 0, bankRoll);
+
+        // Dynamic FOV (Subtle widening on sprint)
         var targetFov = (isSprinting && isMoving) ? 48.0 : 45.0;
         this.eyeEntity.camera.fov = pc.math.lerp(this.eyeEntity.camera.fov, targetFov, dtSec * 6);
     }
 
+    // Footstep audio trigger on downward foot impact
     if (isMoving && this.bobWeight > 0.45) {
         if (this.prevStepPhase > 0 && stepPhase <= 0) {
             this.playFootstep(isSprinting);

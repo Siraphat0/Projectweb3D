@@ -18,7 +18,6 @@ FpsWalker.prototype.initialize = function () {
     this.lastY = 0;
 
     var self = this;
-    window._activeWalker = this;
 
     // ─── Smooth Proxy Floor for Floor02 ───
     var floorEntity = new pc.Entity('SmoothFloor02');
@@ -31,23 +30,38 @@ FpsWalker.prototype.initialize = function () {
         friction: 0.05,
         restitution: 0
     });
-    // floorY = 0.00 (ค่าที่ล็อคถาวร — ผ่านทดสอบ real-time)
-    this.floorY = 0.00;
+    // Raised invisible floor higher so the player walks cleanly above the surface
+    this.floorY = -0.20;
     floorEntity.setPosition(0, this.floorY, 0);
     this.app.root.addChild(floorEntity);
     this.floorEntity = floorEntity;
 
-    // Spawn point at elevator (Floor 02) — X,Y,Z ผ่านการทดสอบ in-game
-    this.initialPos = new pc.Vec3(-7.70, 0.35, -0.40);
+    // Real-time floor height adjust
+    window.adjustFloorY = function (delta) {
+        self.floorY += delta;
+        if (self.floorEntity && self.floorEntity.rigidbody) {
+            self.floorEntity.rigidbody.teleport(new pc.Vec3(0, self.floorY, 0), pc.Vec3.ZERO);
+        }
+        var curP = self.entity.getPosition();
+        if (curP.y < self.floorY + 0.5) {
+            self.entity.setPosition(curP.x, self.floorY + 1.5, curP.z);
+            if (self.entity.rigidbody) {
+                self.entity.rigidbody.teleport(new pc.Vec3(curP.x, self.floorY + 1.5, curP.z), self.eulers);
+            }
+        }
+        var badge = document.getElementById('floor-height-num');
+        if (badge) badge.textContent = self.floorY.toFixed(2) + 'm';
+        console.log('Floor 02 Height:', self.floorY.toFixed(2));
+    };
+
+    // Initial Standing Position (Eye level ~1.5m above floor)
+    var currentPos = this.entity.getPosition().clone();
+    this.initialPos = new pc.Vec3(currentPos.x, this.floorY + 1.50, currentPos.z);
     this.initialRot = this.entity.getEulerAngles().clone();
-    this.elevatorPos = new pc.Vec2(-7.70, -0.40);
-    this._spawnLock = 15;
 
     this.entity.setPosition(this.initialPos);
     if (this.entity.rigidbody) {
-        this.entity.rigidbody.linearVelocity = pc.Vec3.ZERO;
-        this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
-        this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
+        this.entity.rigidbody.teleport(this.initialPos, this.eulers);
     }
     var eyeEntity = new pc.Entity('PlayerEye');
     eyeEntity.addComponent('camera', {
@@ -190,195 +204,6 @@ FpsWalker.prototype.initialize = function () {
     window.addEventListener('touchend', function () {
         self.isDragging = false;
     });
-
-    // ─── Hotspot System & Admin Tool Integration — Floor 02 ───
-    this.hotspots = [];
-
-    // Expose position to Admin Editor
-    window._hotspotEditorGetPos = function () {
-        var p = self.entity.getPosition();
-        return { x: p.x, y: p.y, z: p.z };
-    };
-
-    // Central Hotspot Action & Portal Router
-    function handleHotspotAction(url, name, customAction) {
-        if (typeof customAction === 'function') {
-            customAction();
-            return;
-        }
-        url = url || '';
-        name = name || '';
-
-        // 1. Elevator modal triggers: ONLY when url is '#elevator' or '#modal' or if name is specifically elevator
-        var isElev = url === '#elevator' || url === '#modal' || (name && (name.indexOf('ลิฟต์') !== -1 || name.indexOf('ลิฟต์') !== -1));
-        if (isElev) {
-            if (window.showElevatorModal) {
-                window.showElevatorModal();
-                return;
-            }
-        }
-
-        // 2. Room 9422
-        if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1) {
-            if (window.portalTo9422) { window.portalTo9422(); return; }
-            else { window.location.href = '../9422/'; return; }
-        }
-
-        // 3. Room 9127
-        if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
-            if (window.portalTo9127) { window.portalTo9127(); return; }
-            else { window.location.href = '../9127/'; return; }
-        }
-
-        // 3. External link or standard URL
-        if (url.startsWith('http')) {
-            window.open(url, '_blank');
-            return;
-        }
-        if (url && url !== '#') {
-            window.location.href = url;
-            return;
-        }
-
-        // 4. จุด Hotspot เปล่า ที่ยังไม่ได้เชื่อมโยงไฟล์ (รอผู้ใช้นำไฟล์มาใส่ในภายหลัง)
-        // ไม่เชื่อมไปลิฟต์ และแจ้งเตือนให้ผู้ใช้ทราบ
-        console.log('[Hotspot] จุดเปล่า (รอเชื่อมต่อไฟล์):', name);
-        var toast = document.getElementById('nav-arrival-toast');
-        var toastText = document.getElementById('nav-arrival-text');
-        if (toast && toastText) {
-            toastText.textContent = '📍 ' + (name || 'จุด Hotspot') + ' (ยังไม่ได้เชื่อมต่อไฟล์)';
-            toast.style.background = 'linear-gradient(135deg, rgba(30,41,59,0.96), rgba(15,23,42,0.96))';
-            toast.style.borderColor = '#38bdf8';
-            toast.style.display = 'flex';
-            setTimeout(function () {
-                if (toast) {
-                    toast.style.display = 'none';
-                    toast.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.95),rgba(5,150,105,0.95))';
-                    toast.style.borderColor = '#6ee7b7';
-                }
-            }, 3000);
-        }
-    }
-
-    function createHotspotDom(hs) {
-        var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || 
-                         (hs.url && (hs.url.indexOf('elevator') !== -1 || hs.url === '#elevator')) || 
-                         hs.id === 'hs_elevator_main';
-        var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
-        
-        var rawIcon = hs.icon || '';
-        var isCorrupted = !rawIcon || rawIcon.indexOf('') !== -1 || rawIcon.indexOf('๐') !== -1 || rawIcon.length > 8;
-        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (isCorrupted ? '📍' : rawIcon);
-
-        var el = document.getElementById(hs.id);
-        if (!el) {
-            el = document.createElement('div');
-            el.id = hs.id;
-            el.className = 'hotspot-3d';
-            el.title = hs.name || 'Hotspot';
-            el.innerHTML = '<div class="hotspot-ring"></div>' +
-                           '<div class="hotspot-dot">' + iconHtml + '</div>' +
-                           '<div class="hotspot-label">' +
-                           '  <span class="hotspot-title">' + (hs.name || 'Hotspot') + '</span>' +
-                           '  <span class="hotspot-hint">' + hintText + '</span>' +
-                           '</div>';
-            document.body.appendChild(el);
-        } else {
-            var hintEl = el.querySelector('.hotspot-hint');
-            if (hintEl) hintEl.textContent = hintText;
-            var dotEl = el.querySelector('.hotspot-dot');
-            if (dotEl) dotEl.innerHTML = iconHtml;
-            var titleEl = el.querySelector('.hotspot-title');
-            if (titleEl) titleEl.textContent = hs.name || 'Hotspot';
-        }
-
-        function triggerHotspot(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            if (isElevator && window.showElevatorModal) {
-                window.showElevatorModal();
-                return;
-            }
-            handleHotspotAction(hs.url, hs.name, hs.action);
-        }
-
-        el.onclick = triggerHotspot;
-        el.onmousedown = function (e) { e.stopPropagation(); };
-        el.ontouchstart = function (e) { e.stopPropagation(); };
-
-        hs.dom = el;
-        hs.trigger = triggerHotspot;
-        return el;
-    }
-
-    window._hotspotEditorRegister = function (data) {
-        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
-        if (existing) return;
-
-        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
-        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
-        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
-
-        var isElevator = (data.name && data.name.indexOf('ลิฟต์') !== -1) || 
-                         (data.url && (data.url.indexOf('elevator') !== -1 || data.url === '#elevator')) || 
-                         data.id === 'hs_elevator_main';
-
-        if (isElevator) {
-            self.elevatorPos = new pc.Vec2(posX, posZ);
-        }
-
-        var cleanIcon = data.icon || '';
-        if (isElevator) cleanIcon = '🛗';
-        else if (!cleanIcon || cleanIcon.indexOf('') !== -1 || cleanIcon.indexOf('๐') !== -1 || cleanIcon.length > 8) {
-            cleanIcon = '📍';
-        }
-
-        var hs = {
-            id: data.id,
-            name: data.name || 'Hotspot',
-            hint: isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (data.hint || 'กด [E] หรือคลิกเพื่อเข้า'),
-            icon: cleanIcon,
-            url: data.url || '#',
-            worldPos: new pc.Vec3(posX, posY, posZ),
-            prox: data.prox || 3.0,
-            action: function () {
-                if (isElevator && window.showElevatorModal) {
-                    window.showElevatorModal();
-                    return;
-                }
-                handleHotspotAction(data.url, data.name, null);
-            }
-        };
-        createHotspotDom(hs);
-        self.hotspots.push(hs);
-    };
-
-    window._hotspotEditorUnregister = function (id) {
-        self.hotspots = self.hotspots.filter(function (h) { return h.id !== id; });
-        var el = document.getElementById(id);
-        if (el) el.remove();
-    };
-
-    // Load custom hotspots from localStorage
-    try {
-        var saved = localStorage.getItem('floor02_hotspots_v1');
-        if (saved) {
-            var list = JSON.parse(saved);
-            if (Array.isArray(list)) {
-                list.forEach(function (item) {
-                    window._hotspotEditorRegister(item);
-                });
-            }
-        }
-    } catch (e) {}
-
-    this.hotspots.forEach(function (hs) {
-        createHotspotDom(hs);
-    });
-
-    window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
 FpsWalker.prototype.rotateCamera = function (dx, dy) {
@@ -392,25 +217,13 @@ FpsWalker.prototype.update = function (dt) {
     var app = this.app;
     var dtSec = dt || 0.016;
 
-    // ─── Spawn-Lock: กัน "ตกจากด้านบน" 15 เฟรมแรก ───
-    if (this._spawnLock > 0) {
-        this._spawnLock--;
-        this.entity.setPosition(this.initialPos);
-        if (this.entity.rigidbody) {
-            this.entity.rigidbody.linearVelocity  = pc.Vec3.ZERO;
-            this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
-            this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
-        }
-        return;
-    }
-
     // ─── 1. Cinematic Smooth Look ───
     var rotSmooth = Math.min(1, dtSec * 16);
     this.eulers.x = pc.math.lerp(this.eulers.x, this.targetEulers.x, rotSmooth);
     this.eulers.y = pc.math.lerp(this.eulers.y, this.targetEulers.y, rotSmooth);
     this.entity.setEulerAngles(this.eulers.x, this.eulers.y, 0);
 
-    // ─── 2. Smooth Movement ───
+    // ─── 2. Smooth Movement (Brisk 5.8m/s) ───
     var yawRad = this.eulers.y * pc.math.DEG_TO_RAD;
     var forward = new pc.Vec3(-Math.sin(yawRad), 0, -Math.cos(yawRad));
     var right   = new pc.Vec3(Math.cos(yawRad), 0, -Math.sin(yawRad));
@@ -421,7 +234,7 @@ FpsWalker.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
 
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
     if (isSprinting) {
         targetSpeed *= 1.7; // ~9.8m/s
@@ -436,12 +249,11 @@ FpsWalker.prototype.update = function (dt) {
 
     // ─── 3. Physics & Jump ───
     var isGrounded = false;
-    var pos = this.entity.getPosition();
-
     if (this.entity.rigidbody) {
         var vel = this.entity.rigidbody.linearVelocity;
         var yVel = vel ? vel.y : 0;
 
+        var pos = this.entity.getPosition();
         var rayEnd = new pc.Vec3(pos.x, pos.y - 0.55, pos.z);
         var hit = this.app.systems.rigidbody.raycastFirst(pos, rayEnd);
         isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.55));
@@ -453,58 +265,14 @@ FpsWalker.prototype.update = function (dt) {
         this.entity.rigidbody.linearVelocity = new pc.Vec3(this.currentVelocity.x, yVel, this.currentVelocity.z);
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
 
-        // ─── Hotspots & Proximity Triggers ───
-        var cam = (this.eyeEntity && this.eyeEntity.camera) ? this.eyeEntity.camera : 
-                  (this.cameraEntity && this.cameraEntity.camera ? this.cameraEntity.camera : 
-                  (this.entity.camera ? this.entity.camera : 
-                  (this.entity.findByName('Camera') ? this.entity.findByName('Camera').camera : null)));
-        var camFwd = this.eyeEntity ? this.eyeEntity.forward : this.entity.forward;
-        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
-        var screenPos = new pc.Vec3();
-
-        if (this.hotspots && this.hotspots.length > 0) {
-            for (var i = 0; i < this.hotspots.length; i++) {
-                var hs = this.hotspots[i];
-                if (!hs || !hs.worldPos) continue;
-                var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
-                var el = hs.dom || document.getElementById(hs.id);
-
-                var proxDist = hs.prox || 4.0;
-                if (dist <= proxDist) {
-                    if (app && app.keyboard && app.keyboard.wasPressed(pc.KEY_E)) {
-                        if (typeof hs.trigger === 'function') hs.trigger();
-                        else if (typeof hs.action === 'function') hs.action();
-                    }
-                }
-
-                if (el && cam) {
-                    cam.worldToScreen(hs.worldPos, screenPos);
-                    var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                    var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                    var visibleDist = 35.0; // 35m visibility
-                    if (dist <= visibleDist && dot > 0.05 && screenPos.z > 0) {
-                        el.style.display = 'flex';
-                        el.style.left = Math.round(screenPos.x) + 'px';
-                        el.style.top = Math.round(screenPos.y) + 'px';
-                        var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
-                        el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                    } else {
-                        el.style.display = 'none';
-                    }
-                }
-            }
-        }
-
+        // ─── 4. Elevator Prompt Check ───
         var elevatorPrompt = document.getElementById('elevator-prompt');
         if (elevatorPrompt) {
-            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;
-            var elevZ = this.elevatorPos ? this.elevatorPos.y : -0.40;
-            var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
-            if (distToElev < 3.5 || pos.x <= -6.0) {
+            // When near elevator area
+            if (pos.x <= -6.0) {
                 if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';
                 if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (window.showElevatorModal) window.showElevatorModal();
+                    if (window.portalToFloor01) window.portalToFloor01();
                 }
             } else {
                 if (elevatorPrompt.style.display === 'flex') elevatorPrompt.style.display = 'none';
@@ -515,10 +283,10 @@ FpsWalker.prototype.update = function (dt) {
         isGrounded = true;
     }
 
-    // ─── 4. Realistic Human Head Bobbing, Breathing & Footsteps ───
+    // ─── 5. Realistic Human Head Bobbing, Breathing & Footsteps ───
     var moveSpeed = this.currentVelocity.length();
     var isMoving = (moveSpeed > 0.4) && isGrounded;
-    var stepRate = isSprinting ? 12.0 : 8.8;
+    var stepRate = isSprinting ? 12.8 : 9.6;
 
     if (isMoving) {
         this.bobTimer += dtSec * stepRate;
@@ -529,17 +297,11 @@ FpsWalker.prototype.update = function (dt) {
 
     this.breathTimer += dtSec;
 
-    // Vertical step dip
     var stepPhase = Math.sin(this.bobTimer);
     var bobY = -Math.abs(Math.sin(this.bobTimer)) * (isSprinting ? 0.045 : 0.030) * this.bobWeight;
-
-    // Horizontal head sway (left/right foot weight shift)
     var bobX = Math.cos(this.bobTimer * 0.5) * (isSprinting ? 0.022 : 0.015) * this.bobWeight;
-
-    // Idle breathing
     var breathY = Math.sin(this.breathTimer * 1.5) * 0.008 * (1.0 - this.bobWeight);
 
-    // Subtle bank / roll tilt on strafe
     var strafeAmount = (app.keyboard.isPressed(pc.KEY_A) ? 1 : 0) - (app.keyboard.isPressed(pc.KEY_D) ? 1 : 0);
     var bankRoll = strafeAmount * (isSprinting ? 0.8 : 0.45) * this.bobWeight;
     var headPitch = Math.sin(this.bobTimer) * (isSprinting ? 0.5 : 0.3) * this.bobWeight;
@@ -548,16 +310,22 @@ FpsWalker.prototype.update = function (dt) {
         this.eyeEntity.setLocalPosition(bobX, bobY + breathY, 0);
         this.eyeEntity.setLocalEulerAngles(headPitch, 0, bankRoll);
 
-        // Dynamic FOV on sprint
         var targetFov = (isSprinting && isMoving) ? 48.0 : 45.0;
         this.eyeEntity.camera.fov = pc.math.lerp(this.eyeEntity.camera.fov, targetFov, dtSec * 6);
     }
 
-    // Footstep audio trigger
     if (isMoving && this.bobWeight > 0.45) {
         if (this.prevStepPhase > 0 && stepPhase <= 0) {
             this.playFootstep(isSprinting);
         }
     }
     this.prevStepPhase = stepPhase;
+
+    // Keyboard shortcuts for floor adjustment
+    if (app.keyboard.wasPressed(pc.KEY_OPEN_BRACKET)) {
+        if (window.adjustFloorY) window.adjustFloorY(-0.05);
+    }
+    if (app.keyboard.wasPressed(pc.KEY_CLOSE_BRACKET)) {
+        if (window.adjustFloorY) window.adjustFloorY(0.05);
+    }
 };
