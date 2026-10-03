@@ -337,24 +337,29 @@
         var hotspots = [];
         var STORAGE_KEY = 'floor01_hotspots_v1';
 
-                // Load from localStorage & sanitize broken icons
+                        // Load from localStorage & sanitize broken icons
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 hotspots = JSON.parse(saved);
-                if (Array.isArray(hotspots)) {
-                    var modified = false;
-                    hotspots.forEach(function(h) {
-                        var isElev = h.name && h.name.indexOf('ลิฟต์') !== -1;
-                        if (!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1 || h.icon.length > 8) {
-                            h.icon = isElev ? '🛗' : '📍';
-                            modified = true;
-                        }
-                    });
-                    if (modified) saveToStorage();
-                }
             }
-        } catch(e) {}
+            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                hotspots = [{"id":"hs_academic_contact","name":"ติดต่อฝ่ายวิชาการ/ธุรการ","hint":"คลิกเพื่อดูข้อมูลนักศึกษา","icon":"📍","url":"https://computing.kku.ac.th/students","prox":3,"pos":{"x":-7.117,"y":3.34,"z":-3.903}},{"id":"hs_room_9127","name":"ห้อง 9127","hint":"กด [E] หรือคลิกเพื่อเข้าห้อง","icon":"🚪","url":"../9127/","prox":3,"pos":{"x":-26.087,"y":3.34,"z":-20.398}},{"id":"hs_elevator_floor01","name":"ลิฟต์ชั้น 1","hint":"กด [E] หรือคลิกเพื่อเลือกชั้น","icon":"🛗","url":"#elevator","prox":3,"pos":{"x":10.533,"y":3.34,"z":-2.68}}];
+                saveToStorage();
+            } else {
+                var modified = false;
+                hotspots.forEach(function(h) {
+                    var isElev = h.name && h.name.indexOf('ลิฟต์') !== -1;
+                    if (!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1 || h.icon.length > 8) {
+                        h.icon = isElev ? '🛗' : '📍';
+                        modified = true;
+                    }
+                });
+                if (modified) saveToStorage();
+            }
+        } catch(e) {
+            hotspots = [{"id":"hs_academic_contact","name":"ติดต่อฝ่ายวิชาการ/ธุรการ","hint":"คลิกเพื่อดูข้อมูลนักศึกษา","icon":"📍","url":"https://computing.kku.ac.th/students","prox":3,"pos":{"x":-7.117,"y":3.34,"z":-3.903}},{"id":"hs_room_9127","name":"ห้อง 9127","hint":"กด [E] หรือคลิกเพื่อเข้าห้อง","icon":"🚪","url":"../9127/","prox":3,"pos":{"x":-26.087,"y":3.34,"z":-20.398}},{"id":"hs_elevator_floor01","name":"ลิฟต์ชั้น 1","hint":"กด [E] หรือคลิกเพื่อเลือกชั้น","icon":"🛗","url":"#elevator","prox":3,"pos":{"x":10.533,"y":3.34,"z":-2.68}}];
+        }
 
         function saveToStorage() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch(e) {}

@@ -181,19 +181,43 @@ FpsWalker.prototype.initialize = function () {
         self.isDragging = false;
     });
 
-    // ─── Hotspot System & Admin Tool Integration ───
+        // ─── Hotspot System & Admin Tool Integration ───
     this.hotspots = [
         {
-            id: 'hotspot-9127',
+            id: 'hs_academic_contact',
+            name: 'ติดต่อฝ่ายวิชาการ/ธุรการ',
+            hint: 'คลิกเพื่อดูข้อมูลนักศึกษา',
+            icon: '📍',
+            url: 'https://computing.kku.ac.th/students',
+            worldPos: new pc.Vec3(-7.117, 3.34, -3.903),
+            prox: 3.0,
+            action: function () {
+                window.open('https://computing.kku.ac.th/students', '_blank');
+            }
+        },
+        {
+            id: 'hs_room_9127',
             name: 'ห้อง 9127',
             hint: 'กด [E] หรือคลิกเพื่อเข้าห้อง',
             icon: '🚪',
             url: '../9127/',
-            worldPos: new pc.Vec3(0.0, 3.2, -0.6),
-            prox: 3.2,
+            worldPos: new pc.Vec3(-26.087, 3.34, -20.398),
+            prox: 3.0,
             action: function () {
                 if (window.portalTo9127) window.portalTo9127();
                 else window.location.href = '../9127/';
+            }
+        },
+        {
+            id: 'hs_elevator_floor01',
+            name: 'ลิฟต์ชั้น 1',
+            hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
+            icon: '🛗',
+            url: '#elevator',
+            worldPos: new pc.Vec3(10.533, 3.34, -2.68),
+            prox: 3.0,
+            action: function () {
+                if (window.showElevatorModal) window.showElevatorModal();
             }
         }
     ];
@@ -206,6 +230,10 @@ FpsWalker.prototype.initialize = function () {
 
     // Helper to create or bind DOM element for a hotspot
     function createHotspotDom(hs) {
+        var isElevator = (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url === '#elevator');
+        var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (hs.icon && hs.icon.length <= 4 && hs.icon.indexOf('') === -1 ? hs.icon : '📍');
+        var hintText = isElevator ? 'กด [E] หรือคลิกเพื่อเลือกชั้น' : (hs.hint || 'กด [E] หรือคลิกเพื่อเข้า');
+
         var el = document.getElementById(hs.id);
         if (!el) {
             el = document.createElement('div');
@@ -213,16 +241,21 @@ FpsWalker.prototype.initialize = function () {
             el.className = 'hotspot-3d';
             el.title = hs.name;
             el.innerHTML = '<div class="hotspot-ring"></div>' +
-                           '<div class="hotspot-dot">' + (hs.icon || '📍') + '</div>' +
+                           '<div class="hotspot-dot">' + iconHtml + '</div>' +
                            '<div class="hotspot-label">' +
                            '  <span class="hotspot-title">' + hs.name + '</span>' +
-                           '  <span class="hotspot-hint">' + (hs.hint || 'คลิกเพื่อดู') + '</span>' +
+                           '  <span class="hotspot-hint">' + hintText + '</span>' +
                            '</div>';
             el.onclick = function () {
                 if (hs.action) hs.action();
                 else if (hs.url && hs.url !== '#') window.location.href = hs.url;
             };
             document.body.appendChild(el);
+        } else {
+            var dotEl = el.querySelector('.hotspot-dot');
+            if (dotEl) dotEl.innerHTML = iconHtml;
+            var hintEl = el.querySelector('.hotspot-hint');
+            if (hintEl) hintEl.textContent = hintText;
         }
         hs.dom = el;
         return el;
@@ -230,15 +263,38 @@ FpsWalker.prototype.initialize = function () {
 
     // Register / Unregister hooks for Admin Editor
     window._hotspotEditorRegister = function (data) {
+        var existing = self.hotspots.find(function(h) { return h.id === data.id; });
+        if (existing) return;
+
+        var posX = (data.pos && typeof data.pos.x === 'number') ? data.pos.x : (data.x || 0);
+        var posY = (data.pos && typeof data.pos.y === 'number') ? data.pos.y : (data.y || 0);
+        var posZ = (data.pos && typeof data.pos.z === 'number') ? data.pos.z : (data.z || 0);
+
+        var isElevator = (data.name && data.name.indexOf('ลิฟต์') !== -1) || (data.url === '#elevator');
+        var cleanIcon = isElevator ? '🛗' : (data.icon && data.icon.length <= 4 && data.icon.indexOf('') === -1 ? data.icon : '📍');
+
         var hs = {
             id: data.id,
             name: data.name,
             hint: data.hint,
-            icon: data.icon,
+            icon: cleanIcon,
             url: data.url,
-            worldPos: new pc.Vec3(data.pos.x, data.pos.y, data.pos.z),
+            worldPos: new pc.Vec3(posX, posY, posZ),
             prox: data.prox || 3.0,
             action: function () {
+                if (isElevator && window.showElevatorModal) {
+                    window.showElevatorModal();
+                    return;
+                }
+                if (data.url && data.url.indexOf('9127') !== -1) {
+                    if (window.portalTo9127) window.portalTo9127();
+                    else window.location.href = '../9127/';
+                    return;
+                }
+                if (data.url && data.url.startsWith('http')) {
+                    window.open(data.url, '_blank');
+                    return;
+                }
                 if (data.url && data.url !== '#') window.location.href = data.url;
             }
         };
@@ -259,9 +315,7 @@ FpsWalker.prototype.initialize = function () {
             var parsed = JSON.parse(savedHs);
             if (Array.isArray(parsed)) {
                 parsed.forEach(function (item) {
-                    if (item.id !== 'hotspot-9127') {
-                        window._hotspotEditorRegister(item);
-                    }
+                    window._hotspotEditorRegister(item);
                 });
             }
         }
@@ -272,7 +326,6 @@ FpsWalker.prototype.initialize = function () {
         createHotspotDom(hs);
     });
 
-    // Notify window that hotspot editor is ready
     window.dispatchEvent(new CustomEvent('hotspot-editor-ready'));
 };
 
