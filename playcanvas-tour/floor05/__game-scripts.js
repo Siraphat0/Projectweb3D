@@ -419,8 +419,8 @@ FpsWalker.prototype.initialize = function () {
 };
 
 FpsWalker.prototype.update = function (dt) {
-    var dtSec = Math.min(dt, 0.1);
     var app = this.app;
+    var dtSec = dt || 0.016;
 
     // ─── Spawn-Lock: กัน "ตกจากด้านบน" 15 เฟรมแรก ───
     if (this._spawnLock > 0) {
@@ -431,7 +431,7 @@ FpsWalker.prototype.update = function (dt) {
             this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
             this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
         }
-        return; // ข้ามการประมวลผลปกติจนกว่าจะ lock หมด
+        return;
     }
 
     // ─── 1. Cinematic Smooth Look ───
@@ -440,7 +440,7 @@ FpsWalker.prototype.update = function (dt) {
     this.eulers.y = pc.math.lerp(this.eulers.y, this.targetEulers.y, rotSmooth);
     this.entity.setEulerAngles(this.eulers.x, this.eulers.y, 0);
 
-    // ─── 2. Smooth Movement (Brisk 5.8m/s) ───
+    // ─── 2. Smooth Movement ───
     var yawRad = this.eulers.y * pc.math.DEG_TO_RAD;
     var forward = new pc.Vec3(-Math.sin(yawRad), 0, -Math.cos(yawRad));
     var right   = new pc.Vec3(Math.cos(yawRad), 0, -Math.sin(yawRad));
@@ -464,36 +464,74 @@ FpsWalker.prototype.update = function (dt) {
     var accelFactor = Math.min(1, dtSec * 10);
     this.currentVelocity.lerp(this.currentVelocity, input, accelFactor);
 
-    // ─── 3. Physics & Ground Detection (แบบเดียวกับ Floor 01 & Floor 02) ───
+    // ─── 3. Physics & Jump ───
     var isGrounded = false;
+    var pos = this.entity.getPosition();
+
     if (this.entity.rigidbody) {
         var vel = this.entity.rigidbody.linearVelocity;
         var yVel = vel ? vel.y : 0;
 
-        var pos = this.entity.getPosition();
-        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.70, pos.z);
+        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.55, pos.z);
         var hit = this.app.systems.rigidbody.raycastFirst(pos, rayEnd);
-        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.60));
+        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.55));
 
         if (isGrounded && app.keyboard.wasPressed(pc.KEY_SPACE)) {
             yVel = this.jumpForce || 4.5;
         }
 
-        // ป้องกันตกออกนอกโลกหากหลุดไปต่ำกว่าพื้นมาก
-        if (pos.y < (this.floorY - 4.0)) {
-            this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
-            this.entity.rigidbody.linearVelocity = pc.Vec3.ZERO;
-            return;
-        }
-
         this.entity.rigidbody.linearVelocity = new pc.Vec3(this.currentVelocity.x, yVel, this.currentVelocity.z);
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
 
-        // ─── 4. Elevator Prompt Check (หน้าประตูลิฟต์) ───
+        // ─── Hotspots & Proximity Triggers ───
+        var cam = (this.eyeEntity && this.eyeEntity.camera) ? this.eyeEntity.camera : 
+                  (this.cameraEntity && this.cameraEntity.camera ? this.cameraEntity.camera : 
+                  (this.entity.camera ? this.entity.camera : 
+                  (this.entity.findByName('Camera') ? this.entity.findByName('Camera').camera : null)));
+        var camFwd = this.eyeEntity ? this.eyeEntity.forward : this.entity.forward;
+        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
+        var screenPos = new pc.Vec3();
+
+        if (this.hotspots && this.hotspots.length > 0) {
+            for (var i = 0; i < this.hotspots.length; i++) {
+                var hs = this.hotspots[i];
+                if (!hs || !hs.worldPos) continue;
+                var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+                var el = hs.dom || document.getElementById(hs.id);
+
+                var proxDist = hs.prox || 4.0;
+                if (dist <= proxDist) {
+                    if (app && app.keyboard && app.keyboard.wasPressed(pc.KEY_E)) {
+                        if (typeof hs.trigger === 'function') hs.trigger();
+                        else if (typeof hs.action === 'function') hs.action();
+                    }
+                }
+
+                if (el && cam) {
+                    cam.worldToScreen(hs.worldPos, screenPos);
+                    var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                    var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                    var visibleDist = 35.0; // 35m visibility
+                    if (dist <= visibleDist && dot > 0.05 && screenPos.z > 0) {
+                        el.style.display = 'flex';
+                        el.style.left = Math.round(screenPos.x) + 'px';
+                        el.style.top = Math.round(screenPos.y) + 'px';
+                        var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                        el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            }
+        }
+
         var elevatorPrompt = document.getElementById('elevator-prompt');
-        if (elevatorPrompt && this.elevatorPos) {
-            var distToElev = Math.hypot(pos.x - this.elevatorPos.x, pos.z - this.elevatorPos.y);
-            if (distToElev <= 3.5) {
+        if (elevatorPrompt) {
+            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;
+            var elevZ = this.elevatorPos ? this.elevatorPos.y : -0.40;
+            var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
+            if (distToElev < 3.5 || pos.x <= -6.0) {
                 if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';
                 if (app.keyboard.wasPressed(pc.KEY_E)) {
                     if (window.showElevatorModal) window.showElevatorModal();
@@ -507,10 +545,10 @@ FpsWalker.prototype.update = function (dt) {
         isGrounded = true;
     }
 
-    // ─── 5. Realistic Human Head Bobbing, Breathing & Footsteps ───
+    // ─── 4. Realistic Human Head Bobbing, Breathing & Footsteps ───
     var moveSpeed = this.currentVelocity.length();
     var isMoving = (moveSpeed > 0.4) && isGrounded;
-    var stepRate = isSprinting ? 12.8 : 9.6;
+    var stepRate = isSprinting ? 12.0 : 8.8;
 
     if (isMoving) {
         this.bobTimer += dtSec * stepRate;
@@ -521,11 +559,17 @@ FpsWalker.prototype.update = function (dt) {
 
     this.breathTimer += dtSec;
 
+    // Vertical step dip
     var stepPhase = Math.sin(this.bobTimer);
     var bobY = -Math.abs(Math.sin(this.bobTimer)) * (isSprinting ? 0.045 : 0.030) * this.bobWeight;
+
+    // Horizontal head sway (left/right foot weight shift)
     var bobX = Math.cos(this.bobTimer * 0.5) * (isSprinting ? 0.022 : 0.015) * this.bobWeight;
+
+    // Idle breathing
     var breathY = Math.sin(this.breathTimer * 1.5) * 0.008 * (1.0 - this.bobWeight);
 
+    // Subtle bank / roll tilt on strafe
     var strafeAmount = (app.keyboard.isPressed(pc.KEY_A) ? 1 : 0) - (app.keyboard.isPressed(pc.KEY_D) ? 1 : 0);
     var bankRoll = strafeAmount * (isSprinting ? 0.8 : 0.45) * this.bobWeight;
     var headPitch = Math.sin(this.bobTimer) * (isSprinting ? 0.5 : 0.3) * this.bobWeight;
@@ -534,64 +578,16 @@ FpsWalker.prototype.update = function (dt) {
         this.eyeEntity.setLocalPosition(bobX, bobY + breathY, 0);
         this.eyeEntity.setLocalEulerAngles(headPitch, 0, bankRoll);
 
+        // Dynamic FOV on sprint
         var targetFov = (isSprinting && isMoving) ? 48.0 : 45.0;
         this.eyeEntity.camera.fov = pc.math.lerp(this.eyeEntity.camera.fov, targetFov, dtSec * 6);
     }
 
+    // Footstep audio trigger
     if (isMoving && this.bobWeight > 0.45) {
         if (this.prevStepPhase > 0 && stepPhase <= 0) {
             this.playFootstep(isSprinting);
         }
     }
     this.prevStepPhase = stepPhase;
-
-    // floorY locked — no keyboard adjustment needed
-
-    // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
-        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
-        if (!cam) {
-            var camEnt = this.entity.findByName('Camera');
-            if (camEnt) cam = camEnt.camera;
-        }
-
-        var camPos = this.entity.getPosition();
-        var camFwd = this.entity.forward;
-        var screenPos = new pc.Vec3();
-
-        for (var i = 0; i < this.hotspots.length; i++) {
-            var hs = this.hotspots[i];
-            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
-            var el = hs.dom || document.getElementById(hs.id);
-
-            var proxDist = hs.prox || 4.0;
-            if (dist <= proxDist) {
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (typeof hs.trigger === 'function') hs.trigger();
-                    else if (typeof hs.action === 'function') hs.action();
-                }
-            }
-
-            if (el && cam) {
-                cam.worldToScreen(hs.worldPos, screenPos);
-                var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                var visibleDist = 35.0; // Visible up to 35 meters
-                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
-                    el.style.display = 'flex';
-                    el.style.left = Math.round(screenPos.x) + 'px';
-                    el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
-                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                    if (dist <= proxDist) {
-                        el.classList.add('near');
-                    } else {
-                        el.classList.remove('near');
-                    }
-                } else {
-                    el.style.display = 'none';
-                }
-            }
-        }
-    }
 };

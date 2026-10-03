@@ -384,54 +384,6 @@ FpsWalker.prototype.rotateCamera = function (dx, dy) {
 };
 
 FpsWalker.prototype.update = function (dt) {
-
-        // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
-        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
-        if (!cam) {
-            var camEnt = this.entity.findByName('Camera');
-            if (camEnt) cam = camEnt.camera;
-        }
-
-        var camPos = this.entity.getPosition();
-        var camFwd = this.entity.forward;
-        var screenPos = new pc.Vec3();
-
-        for (var i = 0; i < this.hotspots.length; i++) {
-            var hs = this.hotspots[i];
-            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
-            var el = hs.dom || document.getElementById(hs.id);
-
-            var proxDist = hs.prox || 4.0;
-            if (dist <= proxDist) {
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (typeof hs.trigger === 'function') hs.trigger();
-                    else if (typeof hs.action === 'function') hs.action();
-                }
-            }
-
-            if (el && cam) {
-                cam.worldToScreen(hs.worldPos, screenPos);
-                var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                var visibleDist = 35.0; // Visible up to 35 meters
-                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
-                    el.style.display = 'flex';
-                    el.style.left = Math.round(screenPos.x) + 'px';
-                    el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
-                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                    if (dist <= proxDist) {
-                        el.classList.add('near');
-                    } else {
-                        el.classList.remove('near');
-                    }
-                } else {
-                    el.style.display = 'none';
-                }
-            }
-        }
-    
     var app = this.app;
     var dtSec = dt || 0.016;
 
@@ -479,11 +431,12 @@ FpsWalker.prototype.update = function (dt) {
 
     // ─── 3. Physics & Jump ───
     var isGrounded = false;
+    var pos = this.entity.getPosition();
+
     if (this.entity.rigidbody) {
         var vel = this.entity.rigidbody.linearVelocity;
         var yVel = vel ? vel.y : 0;
 
-        var pos = this.entity.getPosition();
         var rayEnd = new pc.Vec3(pos.x, pos.y - 0.55, pos.z);
         var hit = this.app.systems.rigidbody.raycastFirst(pos, rayEnd);
         isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.55));
@@ -496,45 +449,48 @@ FpsWalker.prototype.update = function (dt) {
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
 
         // ─── Hotspots & Proximity Triggers ───
-        var cam = this.eyeEntity ? this.eyeEntity.camera : null;
-        var camFwd = this.eyeEntity ? this.eyeEntity.forward : null;
+        var cam = (this.eyeEntity && this.eyeEntity.camera) ? this.eyeEntity.camera : 
+                  (this.cameraEntity && this.cameraEntity.camera ? this.cameraEntity.camera : 
+                  (this.entity.camera ? this.entity.camera : 
+                  (this.entity.findByName('Camera') ? this.entity.findByName('Camera').camera : null)));
+        var camFwd = this.eyeEntity ? this.eyeEntity.forward : this.entity.forward;
         var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
         var screenPos = new pc.Vec3();
 
-        for (var i = 0; i < this.hotspots.length; i++) {
-            var hs = this.hotspots[i];
-            var dist = Math.hypot(pos.x - hs.worldPos.x, pos.z - hs.worldPos.z);
-            var el = hs.dom || document.getElementById(hs.id);
+        if (this.hotspots && this.hotspots.length > 0) {
+            for (var i = 0; i < this.hotspots.length; i++) {
+                var hs = this.hotspots[i];
+                if (!hs || !hs.worldPos) continue;
+                var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+                var el = hs.dom || document.getElementById(hs.id);
 
-            // Proximity [E] key activation
-            var proxDist = hs.prox || 3.2;
-            if (dist <= proxDist) {
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (typeof hs.trigger === 'function') hs.trigger();
-                    else if (typeof hs.action === 'function') hs.action();
+                var proxDist = hs.prox || 4.0;
+                if (dist <= proxDist) {
+                    if (app && app.keyboard && app.keyboard.wasPressed(pc.KEY_E)) {
+                        if (typeof hs.trigger === 'function') hs.trigger();
+                        else if (typeof hs.action === 'function') hs.action();
+                    }
                 }
-            }
 
-            if (el && cam) {
-                cam.worldToScreen(hs.worldPos, screenPos);
-                var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                var dot = camFwd ? camFwd.dot(toHs) : 1;
+                if (el && cam) {
+                    cam.worldToScreen(hs.worldPos, screenPos);
+                    var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                    var dot = camFwd ? camFwd.dot(toHs) : 1;
 
-                var isElev = hs.id === 'hs_elevator_main' || (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url && hs.url.indexOf('elevator') !== -1);
-                var visibleDist = isElev ? 25.0 : proxDist;
-                if (dist <= visibleDist && dot > 0.15 && screenPos.z > 0) {
-                    el.style.display = 'flex';
-                    el.style.left = Math.round(screenPos.x) + 'px';
-                    el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = isElev ? pc.math.clamp(1.2 - (dist / 25.0) * 0.35, 0.8, 1.25) : pc.math.clamp(1.25 - (dist / proxDist) * 0.25, 0.85, 1.25);
-                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                } else {
-                    el.style.display = 'none';
+                    var visibleDist = 35.0; // 35m visibility
+                    if (dist <= visibleDist && dot > 0.05 && screenPos.z > 0) {
+                        el.style.display = 'flex';
+                        el.style.left = Math.round(screenPos.x) + 'px';
+                        el.style.top = Math.round(screenPos.y) + 'px';
+                        var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                        el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    } else {
+                        el.style.display = 'none';
+                    }
                 }
             }
         }
 
-        // Elevator Prompt Banner
         var elevatorPrompt = document.getElementById('elevator-prompt');
         if (elevatorPrompt) {
             var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;

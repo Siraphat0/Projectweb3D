@@ -332,56 +332,8 @@ FpsWalker.prototype.initialize = function () {
 };
 
 FpsWalker.prototype.update = function (dt) {
-
-        // ─── 3D Hotspot Screen Projection & Proximity Trigger ───
-        var cam = this.entity.camera || (this.eyeEntity && this.eyeEntity.camera) || this.app.root.findByName('Camera') ? this.app.root.findByName('Camera').camera : null;
-        if (!cam) {
-            var camEnt = this.entity.findByName('Camera');
-            if (camEnt) cam = camEnt.camera;
-        }
-
-        var camPos = this.entity.getPosition();
-        var camFwd = this.entity.forward;
-        var screenPos = new pc.Vec3();
-
-        for (var i = 0; i < this.hotspots.length; i++) {
-            var hs = this.hotspots[i];
-            var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
-            var el = hs.dom || document.getElementById(hs.id);
-
-            var proxDist = hs.prox || 4.0;
-            if (dist <= proxDist) {
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (typeof hs.trigger === 'function') hs.trigger();
-                    else if (typeof hs.action === 'function') hs.action();
-                }
-            }
-
-            if (el && cam) {
-                cam.worldToScreen(hs.worldPos, screenPos);
-                var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                var visibleDist = 35.0; // Visible up to 35 meters
-                if (dist <= visibleDist && dot > 0.1 && screenPos.z > 0) {
-                    el.style.display = 'flex';
-                    el.style.left = Math.round(screenPos.x) + 'px';
-                    el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
-                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                    if (dist <= proxDist) {
-                        el.classList.add('near');
-                    } else {
-                        el.classList.remove('near');
-                    }
-                } else {
-                    el.style.display = 'none';
-                }
-            }
-        }
-    
-    var dtSec = Math.min(dt, 0.1);
     var app = this.app;
+    var dtSec = dt || 0.016;
 
     // ─── Spawn-Lock: กัน "ตกจากด้านบน" 15 เฟรมแรก ───
     if (this._spawnLock > 0) {
@@ -395,120 +347,160 @@ FpsWalker.prototype.update = function (dt) {
         return;
     }
 
+    // ─── 1. Cinematic Smooth Look ───
     var rotSmooth = Math.min(1, dtSec * 16);
     this.eulers.x = pc.math.lerp(this.eulers.x, this.targetEulers.x, rotSmooth);
     this.eulers.y = pc.math.lerp(this.eulers.y, this.targetEulers.y, rotSmooth);
     this.entity.setEulerAngles(this.eulers.x, this.eulers.y, 0);
-    var yawRad  = this.eulers.y * pc.math.DEG_TO_RAD;
+
+    // ─── 2. Smooth Movement ───
+    var yawRad = this.eulers.y * pc.math.DEG_TO_RAD;
     var forward = new pc.Vec3(-Math.sin(yawRad), 0, -Math.cos(yawRad));
-    var right   = new pc.Vec3( Math.cos(yawRad), 0, -Math.sin(yawRad));
+    var right   = new pc.Vec3(Math.cos(yawRad), 0, -Math.sin(yawRad));
+
     var input = new pc.Vec3();
     if (app.keyboard.isPressed(pc.KEY_W) || app.keyboard.isPressed(pc.KEY_UP))    input.add(forward);
     if (app.keyboard.isPressed(pc.KEY_S) || app.keyboard.isPressed(pc.KEY_DOWN))  input.sub(forward);
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
-    var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
+
     var targetSpeed = this.speed || 6.5;
-    if (isSprinting) targetSpeed *= 1.7; // ~9.8 m/s sprint
-    if (input.lengthSq() > 0) input.normalize().scale(targetSpeed);
+    var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
+    if (isSprinting) {
+        targetSpeed *= 1.7; // ~9.8m/s
+    }
+
+    if (input.lengthSq() > 0) {
+        input.normalize().scale(targetSpeed);
+    }
+
     var accelFactor = Math.min(1, dtSec * 10);
     this.currentVelocity.lerp(this.currentVelocity, input, accelFactor);
+
+    // ─── 3. Physics & Jump ───
     var isGrounded = false;
+    var pos = this.entity.getPosition();
+
     if (this.entity.rigidbody) {
         var vel = this.entity.rigidbody.linearVelocity;
         var yVel = vel ? vel.y : 0;
-        var pos = this.entity.getPosition();
-        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.70, pos.z);
+
+        var rayEnd = new pc.Vec3(pos.x, pos.y - 0.55, pos.z);
         var hit = this.app.systems.rigidbody.raycastFirst(pos, rayEnd);
-        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.60));
-        if (isGrounded && app.keyboard.wasPressed(pc.KEY_SPACE)) yVel = this.jumpForce || 4.5;
-        if (pos.y < (this.floorY - 5.0)) {
-            this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
-            this.entity.rigidbody.linearVelocity = pc.Vec3.ZERO;
-            return;
+        isGrounded = (hit !== null) || (pos.y <= (this.floorY + 0.55));
+
+        if (isGrounded && app.keyboard.wasPressed(pc.KEY_SPACE)) {
+            yVel = this.jumpForce || 4.5;
         }
+
         this.entity.rigidbody.linearVelocity = new pc.Vec3(this.currentVelocity.x, yVel, this.currentVelocity.z);
         this.entity.rigidbody.teleport(this.entity.getPosition(), this.eulers);
-        var elevatorPrompt = document.getElementById("elevator-prompt");
-        if (elevatorPrompt && this.elevatorPos) {
-            var distToElev = Math.hypot(pos.x - this.elevatorPos.x, pos.z - this.elevatorPos.y);
-            if (distToElev <= 3.5) {
-                if (elevatorPrompt.style.display !== "flex") elevatorPrompt.style.display = "flex";
-                if (app.keyboard.wasPressed(pc.KEY_E)) { if (window.showElevatorModal) window.showElevatorModal(); }
+
+        // ─── Hotspots & Proximity Triggers ───
+        var cam = (this.eyeEntity && this.eyeEntity.camera) ? this.eyeEntity.camera : 
+                  (this.cameraEntity && this.cameraEntity.camera ? this.cameraEntity.camera : 
+                  (this.entity.camera ? this.entity.camera : 
+                  (this.entity.findByName('Camera') ? this.entity.findByName('Camera').camera : null)));
+        var camFwd = this.eyeEntity ? this.eyeEntity.forward : this.entity.forward;
+        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : pos;
+        var screenPos = new pc.Vec3();
+
+        if (this.hotspots && this.hotspots.length > 0) {
+            for (var i = 0; i < this.hotspots.length; i++) {
+                var hs = this.hotspots[i];
+                if (!hs || !hs.worldPos) continue;
+                var dist = Math.hypot(camPos.x - hs.worldPos.x, camPos.z - hs.worldPos.z);
+                var el = hs.dom || document.getElementById(hs.id);
+
+                var proxDist = hs.prox || 4.0;
+                if (dist <= proxDist) {
+                    if (app && app.keyboard && app.keyboard.wasPressed(pc.KEY_E)) {
+                        if (typeof hs.trigger === 'function') hs.trigger();
+                        else if (typeof hs.action === 'function') hs.action();
+                    }
+                }
+
+                if (el && cam) {
+                    cam.worldToScreen(hs.worldPos, screenPos);
+                    var toHs = hs.worldPos.clone().sub(camPos).normalize();
+                    var dot = camFwd ? camFwd.dot(toHs) : 1;
+
+                    var visibleDist = 35.0; // 35m visibility
+                    if (dist <= visibleDist && dot > 0.05 && screenPos.z > 0) {
+                        el.style.display = 'flex';
+                        el.style.left = Math.round(screenPos.x) + 'px';
+                        el.style.top = Math.round(screenPos.y) + 'px';
+                        var scale = pc.math.clamp(1.2 - (dist / 35.0) * 0.4, 0.8, 1.25);
+                        el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        var elevatorPrompt = document.getElementById('elevator-prompt');
+        if (elevatorPrompt) {
+            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;
+            var elevZ = this.elevatorPos ? this.elevatorPos.y : -0.40;
+            var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
+            if (distToElev < 3.5 || pos.x <= -6.0) {
+                if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';
+                if (app.keyboard.wasPressed(pc.KEY_E)) {
+                    if (window.showElevatorModal) window.showElevatorModal();
+                }
             } else {
-                if (elevatorPrompt.style.display === "flex") elevatorPrompt.style.display = "none";
+                if (elevatorPrompt.style.display === 'flex') elevatorPrompt.style.display = 'none';
             }
         }
     } else {
         this.entity.translate(this.currentVelocity.x * dtSec, 0, this.currentVelocity.z * dtSec);
         isGrounded = true;
     }
+
+    // ─── 4. Realistic Human Head Bobbing, Breathing & Footsteps ───
     var moveSpeed = this.currentVelocity.length();
-    var isMoving  = (moveSpeed > 0.4) && isGrounded;
-    var stepRate  = isSprinting ? 12.8 : 9.6;
+    var isMoving = (moveSpeed > 0.4) && isGrounded;
+    var stepRate = isSprinting ? 12.0 : 8.8;
+
     if (isMoving) {
-        this.bobTimer  += dtSec * stepRate;
-        this.bobWeight  = pc.math.lerp(this.bobWeight, 1.0, dtSec * 8);
+        this.bobTimer += dtSec * stepRate;
+        this.bobWeight = pc.math.lerp(this.bobWeight, 1.0, dtSec * 8);
     } else {
-        this.bobWeight  = pc.math.lerp(this.bobWeight, 0.0, dtSec * 6);
+        this.bobWeight = pc.math.lerp(this.bobWeight, 0.0, dtSec * 6);
     }
+
     this.breathTimer += dtSec;
+
+    // Vertical step dip
     var stepPhase = Math.sin(this.bobTimer);
-    var bobY  = -Math.abs(Math.sin(this.bobTimer)) * (isSprinting ? 0.045 : 0.030) * this.bobWeight;
-    var bobX  =  Math.cos(this.bobTimer * 0.5)     * (isSprinting ? 0.022 : 0.015) * this.bobWeight;
+    var bobY = -Math.abs(Math.sin(this.bobTimer)) * (isSprinting ? 0.045 : 0.030) * this.bobWeight;
+
+    // Horizontal head sway (left/right foot weight shift)
+    var bobX = Math.cos(this.bobTimer * 0.5) * (isSprinting ? 0.022 : 0.015) * this.bobWeight;
+
+    // Idle breathing
     var breathY = Math.sin(this.breathTimer * 1.5) * 0.008 * (1.0 - this.bobWeight);
-    var strafeAmt = (app.keyboard.isPressed(pc.KEY_A) ? 1 : 0) - (app.keyboard.isPressed(pc.KEY_D) ? 1 : 0);
-    var bankRoll  = strafeAmt * (isSprinting ? 0.8 : 0.45) * this.bobWeight;
+
+    // Subtle bank / roll tilt on strafe
+    var strafeAmount = (app.keyboard.isPressed(pc.KEY_A) ? 1 : 0) - (app.keyboard.isPressed(pc.KEY_D) ? 1 : 0);
+    var bankRoll = strafeAmount * (isSprinting ? 0.8 : 0.45) * this.bobWeight;
     var headPitch = Math.sin(this.bobTimer) * (isSprinting ? 0.5 : 0.3) * this.bobWeight;
+
     if (this.eyeEntity) {
         this.eyeEntity.setLocalPosition(bobX, bobY + breathY, 0);
         this.eyeEntity.setLocalEulerAngles(headPitch, 0, bankRoll);
+
+        // Dynamic FOV on sprint
         var targetFov = (isSprinting && isMoving) ? 48.0 : 45.0;
         this.eyeEntity.camera.fov = pc.math.lerp(this.eyeEntity.camera.fov, targetFov, dtSec * 6);
     }
+
+    // Footstep audio trigger
     if (isMoving && this.bobWeight > 0.45) {
-        if (this.prevStepPhase > 0 && stepPhase <= 0) this.playFootstep(isSprinting);
-    }
-    this.prevStepPhase = stepPhase;
-    if (this.hotspots && this.hotspots.length > 0) {
-        var cam = this.eyeEntity ? this.eyeEntity.camera : null;
-        var camFwd = this.eyeEntity ? this.eyeEntity.forward : null;
-        var camPos = this.eyeEntity ? this.eyeEntity.getPosition() : this.entity.getPosition();
-        var screenPos = new pc.Vec3();
-        var pPos = this.entity.getPosition();
-
-        for (var i = 0; i < this.hotspots.length; i++) {
-            var hs = this.hotspots[i];
-            var dist = Math.hypot(pPos.x - hs.worldPos.x, pPos.z - hs.worldPos.z);
-            var el = hs.dom || document.getElementById(hs.id);
-
-            var proxDist = hs.prox || 3.0;
-            if (dist <= proxDist) {
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (typeof hs.trigger === 'function') hs.trigger();
-                    else if (typeof hs.action === 'function') hs.action();
-                }
-            }
-
-            if (el && cam) {
-                cam.worldToScreen(hs.worldPos, screenPos);
-                var toHs = hs.worldPos.clone().sub(camPos).normalize();
-                var dot = camFwd ? camFwd.dot(toHs) : 1;
-
-                var isElev = hs.id === 'hs_elevator_main' || (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url && hs.url.indexOf('elevator') !== -1);
-                var visibleDist = isElev ? 25.0 : proxDist;
-                if (dist <= visibleDist && dot > 0.15 && screenPos.z > 0) {
-                    el.style.display = 'flex';
-                    el.style.left = Math.round(screenPos.x) + 'px';
-                    el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = isElev ? pc.math.clamp(1.2 - (dist / 25.0) * 0.35, 0.8, 1.25) : pc.math.clamp(1.25 - (dist / proxDist) * 0.25, 0.85, 1.25);
-                    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
-                } else {
-                    el.style.display = 'none';
-                }
-            }
+        if (this.prevStepPhase > 0 && stepPhase <= 0) {
+            this.playFootstep(isSprinting);
         }
     }
-    // floorY locked — no keyboard adjustment needed
+    this.prevStepPhase = stepPhase;
 };
-
