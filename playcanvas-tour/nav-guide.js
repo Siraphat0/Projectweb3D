@@ -28,54 +28,128 @@
     var ANGLE_OFFSET = 180; // Rotation offset for PlayCanvas plane forward vector
 
     // ─────────────────────────────────────────────────────────────
-    // 0. Corridor Waypoints & Hallway Network per Floor
+    // 0. Connected Corridor Waypoint Graphs per Floor
     // ─────────────────────────────────────────────────────────────
-    var FLOOR_CORRIDORS = {
-        floor01: [
-            { x: -7.70, z: -0.40 },    // Elevator (Floor 01)
-            { x: -7.12, z: -0.55 },    // Academic office junction
-            { x: -7.12, z: -3.90 },    // Academic office entrance
-            { x: 0.00, z: -0.55 },     // Mid hall
-            { x: 7.81, z: -0.55 },     // Spawn / Corridor East
-            { x: -26.09, z: -0.55 },   // Corner turn to Lab 9127
-            { x: -26.09, z: -20.40 }   // Room 9127 Door
-        ],
-        floor02: [
-            { x: -7.70, z: -0.40 },    // Elevator (Floor 02)
-            { x: -1.00, z: -0.40 },    // Corridor West
-            { x: 2.50, z: -0.40 },     // Co-Working Space
-            { x: 7.50, z: -0.40 },     // Corridor East
-            { x: 12.50, z: -0.40 }     // Library & Student Lounge
-        ],
-        floor03: [
-            { x: -1.27, z: 6.17 },     // Elevator (Floor 03)
-            { x: 5.00, z: 6.17 },      // Hallway to Lecture room
-            { x: 15.20, z: 6.17 },     // Room 9301
-            { x: -1.27, z: 0.00 },     // Mid hall junction
-            { x: -1.27, z: -5.00 },    // Corridor North
-            { x: -1.27, z: -10.50 }    // Computer Lab
-        ],
-        floor04: [
-            { x: 0.08, z: 24.32 },     // Elevator (Floor 04)
-            { x: 8.00, z: 24.32 },     // Hallway to Dept Office
-            { x: 16.50, z: 24.32 },    // Dept Office
-            { x: 0.08, z: 15.00 },     // Mid hallway
-            { x: 0.08, z: 5.00 }       // Classroom 9401
-        ],
-        floor05: [
-            { x: -2.96, z: -0.98 },    // Elevator (Floor 05)
-            { x: 5.00, z: -0.98 },     // Hallway to Meeting room
-            { x: 14.00, z: -0.98 },    // Meeting Room 9501
-            { x: -2.96, z: 6.50 },     // Mid hallway
-            { x: -2.96, z: 14.50 }     // Dean Office
-        ],
-        inside: [
-            { x: -6.50, z: 2.50 },     // Info Desk
-            { x: -0.46, z: 2.50 },     // Main Lobby Center
-            { x: 6.80, z: 2.50 },      // Junction to Elevator
-            { x: 6.80, z: -3.20 }      // Main Elevator
-        ]
+    var FLOOR_GRAPHS = {
+        floor01: {
+            'elev':         { x: 10.533, z: -2.68, edges: ['elev_junc'] },
+            'elev_junc':    { x: 10.533, z: -0.55, edges: ['elev', 'east_spawn'] },
+            'east_spawn':   { x: 7.81,   z: -0.55, edges: ['elev_junc', 'mid_hall'] },
+            'mid_hall':     { x: 0.00,   z: -0.55, edges: ['east_spawn', 'junc_acad'] },
+            'junc_acad':    { x: -7.12,  z: -0.55, edges: ['mid_hall', 'acad_door', 'corner_9127'] },
+            'acad_door':    { x: -7.12,  z: -3.90, edges: ['junc_acad'] },
+            'corner_9127':  { x: -26.09, z: -0.55, edges: ['junc_acad', 'door_9127'] },
+            'door_9127':    { x: -26.09, z: -20.40, edges: ['corner_9127'] }
+        },
+        floor02: {
+            'elev':         { x: -7.84,  z: 2.04,  edges: ['west'] },
+            'west':         { x: -1.00,  z: -0.40, edges: ['elev', 'coworking'] },
+            'coworking':    { x: 2.50,   z: -0.40, edges: ['west', 'east'] },
+            'east':         { x: 7.50,   z: -0.40, edges: ['coworking', 'lounge'] },
+            'lounge':       { x: 12.50,  z: -0.40, edges: ['east'] }
+        },
+        floor03: {
+            'elev':         { x: -1.27,  z: 6.17,  edges: ['lecture_hall', 'mid'] },
+            'lecture_hall': { x: 5.00,   z: 6.17,  edges: ['elev', 'room_9301'] },
+            'room_9301':    { x: 15.20,  z: 6.17,  edges: ['lecture_hall'] },
+            'mid':          { x: -1.27,  z: 0.00,  edges: ['elev', 'north'] },
+            'north':        { x: -1.27,  z: -5.00, edges: ['mid', 'com_lab'] },
+            'com_lab':      { x: -1.27,  z: -10.50, edges: ['north'] }
+        },
+        floor04: {
+            'elev':         { x: 2.82,   z: 24.65, edges: ['junction'] },
+            'junction':     { x: 0.08,   z: 24.32, edges: ['elev', 'dept_hall', 'mid'] },
+            'dept_hall':    { x: 8.00,   z: 24.32, edges: ['junction', 'dept_office'] },
+            'dept_office':  { x: 16.50,  z: 24.32, edges: ['dept_hall'] },
+            'mid':          { x: 0.08,   z: 15.00, edges: ['junction', 'class_9401'] },
+            'class_9401':   { x: 0.08,   z: 5.00,  edges: ['mid'] }
+        },
+        floor05: {
+            'elev':         { x: -2.96,  z: -0.98, edges: ['meet_hall', 'mid'] },
+            'meet_hall':    { x: 5.00,   z: -0.98, edges: ['elev', 'room_9501', 'room_9524'] },
+            'room_9501':    { x: 14.00,  z: -0.98, edges: ['meet_hall'] },
+            'room_9524':    { x: 7.59,   z: 1.51,  edges: ['meet_hall', 'room_9525'] },
+            'room_9525':    { x: 10.92,  z: 2.66,  edges: ['room_9524'] },
+            'mid':          { x: -2.96,  z: 6.50,  edges: ['elev', 'dean_office'] },
+            'dean_office':  { x: -2.96,  z: 14.50, edges: ['mid'] }
+        },
+        inside: {
+            'info':         { x: -6.50,  z: 2.50,  edges: ['lobby'] },
+            'lobby':        { x: -0.46,  z: 2.50,  edges: ['info', 'junc'] },
+            'junc':         { x: 6.80,   z: 2.50,  edges: ['lobby', 'elev'] },
+            'elev':         { x: 6.80,   z: -3.20, edges: ['junc'] }
+        }
     };
+
+    function findNearestGraphNode(pos, graph) {
+        var bestKey = null;
+        var bestDist = Infinity;
+        for (var key in graph) {
+            if (!graph.hasOwnProperty(key)) continue;
+            var node = graph[key];
+            var d = Math.hypot(node.x - pos.x, node.z - pos.z);
+            if (d < bestDist) {
+                bestDist = d;
+                bestKey = key;
+            }
+        }
+        return bestKey;
+    }
+
+    function dijkstraShortestPath(startKey, endKey, graph) {
+        if (startKey === endKey) return [startKey];
+        var dists = {};
+        var prev = {};
+        var unvisited = [];
+
+        for (var k in graph) {
+            if (!graph.hasOwnProperty(k)) continue;
+            dists[k] = Infinity;
+            unvisited.push(k);
+        }
+        dists[startKey] = 0;
+
+        while (unvisited.length > 0) {
+            var curr = null;
+            var minD = Infinity;
+            var currIdx = -1;
+            for (var i = 0; i < unvisited.length; i++) {
+                var nodeKey = unvisited[i];
+                if (dists[nodeKey] < minD) {
+                    minD = dists[nodeKey];
+                    curr = nodeKey;
+                    currIdx = i;
+                }
+            }
+
+            if (!curr || minD === Infinity) break;
+            if (curr === endKey) break;
+
+            unvisited.splice(currIdx, 1);
+
+            var neighbors = graph[curr].edges || [];
+            for (var j = 0; j < neighbors.length; j++) {
+                var nKey = neighbors[j];
+                if (!graph[nKey]) continue;
+                var edgeWeight = Math.hypot(graph[curr].x - graph[nKey].x, graph[curr].z - graph[nKey].z);
+                var alt = dists[curr] + edgeWeight;
+                if (alt < dists[nKey]) {
+                    dists[nKey] = alt;
+                    prev[nKey] = curr;
+                }
+            }
+        }
+
+        var path = [];
+        var u = endKey;
+        if (prev[u] || u === startKey) {
+            while (u) {
+                path.unshift(u);
+                u = prev[u];
+            }
+        }
+        return path.length > 0 ? path : [startKey, endKey];
+    }
 
     function getCurrentFloorId() {
         var path = (window.location.pathname || '').toLowerCase();
@@ -240,6 +314,7 @@
         navMaterial.blendType = pc.BLEND_ADDITIVE;
         navMaterial.cull = pc.CULLFACE_NONE;
         navMaterial.depthWrite = false;
+        navMaterial.depthTest = true;
         navMaterial.update();
 
         ringMaterial = new pc.StandardMaterial();
@@ -278,23 +353,7 @@
     // 3. Hallway Route Calculation (Turns & Curves along Corridors)
     // ─────────────────────────────────────────────────────────────
 
-    function findNearestNodeIndex(pos, nodes) {
-        var bestIdx = 0;
-        var bestDist = Infinity;
-        for (var i = 0; i < nodes.length; i++) {
-            var d = Math.hypot(nodes[i].x - pos.x, nodes[i].z - pos.z);
-            if (d < bestDist) {
-                bestDist = d;
-                bestIdx = i;
-            }
-        }
-        return bestIdx;
-    }
-
     function computeCorridorPath(playerPos, targetPos) {
-        var floorId = getCurrentFloorId();
-        var nodes = FLOOR_CORRIDORS[floorId];
-
         // 1. If target has explicit waypoints defined, use them
         if (activeTarget && Array.isArray(activeTarget.waypoints) && activeTarget.waypoints.length > 0) {
             var wp = [{ x: playerPos.x, z: playerPos.z }];
@@ -306,22 +365,30 @@
         }
 
         var directDist = Math.hypot(targetPos.x - playerPos.x, targetPos.z - playerPos.z);
-        if (!nodes || nodes.length < 2 || directDist < 3.2) {
+        var floorId = getCurrentFloorId();
+        var graph = FLOOR_GRAPHS[floorId];
+
+        if (!graph || directDist < 2.0) {
             return [
                 { x: playerPos.x, z: playerPos.z },
                 { x: targetPos.x, z: targetPos.z }
             ];
         }
 
-        // 2. Find nearest corridor nodes
-        var startNodeIdx = findNearestNodeIndex(playerPos, nodes);
-        var endNodeIdx   = findNearestNodeIndex(targetPos, nodes);
+        var startNodeKey = findNearestGraphNode(playerPos, graph);
+        var endNodeKey   = findNearestGraphNode(targetPos, graph);
 
-        if (startNodeIdx === endNodeIdx) {
-            var n = nodes[startNodeIdx];
-            var dDirect = directDist;
+        if (!startNodeKey || !endNodeKey) {
+            return [
+                { x: playerPos.x, z: playerPos.z },
+                { x: targetPos.x, z: targetPos.z }
+            ];
+        }
+
+        if (startNodeKey === endNodeKey) {
+            var n = graph[startNodeKey];
             var dVia = Math.hypot(n.x - playerPos.x, n.z - playerPos.z) + Math.hypot(targetPos.x - n.x, targetPos.z - n.z);
-            if (dVia < dDirect * 1.35) {
+            if (dVia < directDist * 1.35) {
                 return [
                     { x: playerPos.x, z: playerPos.z },
                     { x: n.x, z: n.z },
@@ -334,15 +401,18 @@
             ];
         }
 
-        // 3. Connect through corridor node sequence
+        var nodePath = dijkstraShortestPath(startNodeKey, endNodeKey, graph);
         var rawPath = [{ x: playerPos.x, z: playerPos.z }];
-        var step = (endNodeIdx > startNodeIdx) ? 1 : -1;
-        for (var i = startNodeIdx; i !== endNodeIdx + step; i += step) {
-            rawPath.push({ x: nodes[i].x, z: nodes[i].z });
+
+        for (var i = 0; i < nodePath.length; i++) {
+            var node = graph[nodePath[i]];
+            if (node) {
+                rawPath.push({ x: node.x, z: node.z });
+            }
         }
         rawPath.push({ x: targetPos.x, z: targetPos.z });
 
-        // 4. Remove backwards hook if player is already ahead of first waypoint
+        // Remove backwards hook if player is already past the first corridor node
         if (rawPath.length >= 3) {
             var d02 = Math.hypot(rawPath[2].x - rawPath[0].x, rawPath[2].z - rawPath[0].z);
             var d12 = Math.hypot(rawPath[2].x - rawPath[1].x, rawPath[2].z - rawPath[1].z);
@@ -467,6 +537,20 @@
         }
     }
 
+    function updateActiveNavBanner(hs) {
+        var pill = document.getElementById('nav-active-pill');
+        var nameEl = document.getElementById('nav-active-name');
+        if (pill && nameEl) {
+            nameEl.textContent = hs.name || 'จุดหมาย';
+            pill.style.display = 'flex';
+        }
+    }
+
+    function hideActiveNavBanner() {
+        var pill = document.getElementById('nav-active-pill');
+        if (pill) pill.style.display = 'none';
+    }
+
     function onArrived() {
         var name = activeTarget ? activeTarget.name : 'จุดหมาย';
         cancelNavigation();
@@ -498,8 +582,7 @@
         }
 
         activeTarget = hs;
-
-
+        updateActiveNavBanner(hs);
         window.toggleNavMenu(false);
     };
 
@@ -507,6 +590,7 @@
         activeTarget = null;
         if (targetRing) targetRing.enabled = false;
         navArrows.forEach(function (a) { a.enabled = false; });
+        hideActiveNavBanner();
     };
 
     window.toggleNavMenu = function (forceState) {
@@ -734,6 +818,18 @@
         toast.style.cssText = 'display:none; position:fixed; top:85px; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #f95738; border-left:4px solid #f95738; box-shadow:0 6px 20px rgba(0,0,0,0.2); color:#1f2937; padding:11px 20px; border-radius:6px; font-size:14px; font-weight:600; align-items:center; gap:10px; z-index:10001; animation:arrival-pop 0.3s ease-out; font-family:\'Sarabun\',sans-serif;';
         toast.innerHTML = '<span id="nav-arrival-text">ถึงจุดหมายแล้ว</span>';
         document.body.appendChild(toast);
+
+        // Active Navigation HUD Pill
+        var activePill = document.createElement('div');
+        activePill.id = 'nav-active-pill';
+        activePill.style.cssText = 'display:none; position:fixed; top:82px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1.5px solid rgba(56,189,248,0.7); box-shadow:0 8px 30px rgba(0,0,0,0.35); color:#f8fafc; padding:8px 18px; border-radius:50px; font-size:13.5px; font-weight:600; align-items:center; gap:12px; z-index:10000; font-family:\'Sarabun\',sans-serif;';
+        activePill.innerHTML =
+            '<span style="display:inline-flex; align-items:center; gap:6px;">' +
+            '  <span style="color:#38bdf8; font-size:16px;">🧭</span>' +
+            '  <span>กำลังนำทาง: <strong id="nav-active-name" style="color:#38bdf8;">...</strong></span>' +
+            '</span>' +
+            '<button onclick="window.cancelNavigation()" style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.5); color:#fca5a5; padding:3px 10px; border-radius:999px; font-size:12px; cursor:pointer; font-weight:600;">✕ ยกเลิก</button>';
+        document.body.appendChild(activePill);
 
         // Enhance HUD button to show "🔍 ค้นหาห้อง..."
         var navBtn = document.getElementById('btn-nav-guide');

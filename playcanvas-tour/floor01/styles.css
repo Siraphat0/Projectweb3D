@@ -523,7 +523,7 @@ canvas:focus {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    width: 300px;
+    width: 230px;
     background: #ffffff !important;
     border: 1px solid #f1f5f9 !important;
     border-top: 4px solid #f95738 !important;
@@ -532,7 +532,7 @@ canvas:focus {
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
     display: none;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     z-index: 99999 !important;
     pointer-events: auto !important;
     animation: hudMenuIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -591,9 +591,9 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
 .hud-menu-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 10px;
     text-decoration: none;
     color: #334155 !important;
     transition: all 0.18s ease;
@@ -616,10 +616,7 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
 }
 
 .hud-menu-icon {
-    font-size: 18px;
-    width: 24px;
-    text-align: center;
-    flex-shrink: 0;
+    display: none !important;
 }
 
 .hud-menu-content {
@@ -629,25 +626,13 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
 
 .hud-menu-title {
     font-size: 13.5px;
-    font-weight: 700;
+    font-weight: 600;
     display: block;
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 .hud-menu-sub {
-    font-size: 11px;
-    color: #64748b;
-    display: block;
-    margin-top: 1px;
-    font-weight: 400;
-}
-
-.hud-menu-item:hover .hud-menu-sub {
-    color: #ea580c;
-}
-
-.hud-menu-item.current .hud-menu-sub {
-    color: rgba(255, 255, 255, 0.9) !important;
+    display: none !important;
 }
 
 .hud-current-badge {
@@ -662,12 +647,16 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
 }
 
 /* Prompt Banner with Orange Theme */
-#door-prompt, #elevator-prompt, #door-9127-prompt {
+#door-prompt, #door-9127-prompt {
     background: #ffffff !important;
     color: #1e293b !important;
     border: 2px solid #f95738 !important;
     box-shadow: 0 10px 32px rgba(249, 87, 56, 0.35) !important;
     font-weight: 700 !important;
+}
+
+#elevator-prompt, .elevator-prompt-bar {
+    display: none !important;
 }
 
 #door-prompt:hover, #elevator-prompt:hover, #door-9127-prompt:hover {
@@ -1260,4 +1249,12 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
     justify-content: center;
     padding: 12px;
     font-size: 15px;
+}
+
+#btn-hotspot-editor {
+    display: none !important;
+}
+
+#btn-hotspot-editor.admin-visible {
+    display: inline-flex !important;
 }

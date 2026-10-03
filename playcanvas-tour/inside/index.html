@@ -120,61 +120,29 @@
                                 <div class="hud-dropdown-menu">
                     <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
                     <a href="../home/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏠</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าโฮม</span>
-                            <span class="hud-menu-sub">หน้าแรกของระบบ Virtual Tour</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าโฮม</span>
                     </a>
                     <a href="../" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏛️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
-                            <span class="hud-menu-sub">ทางเข้าด้านหน้าอาคาร SC.09</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
                     </a>
                     <a href="./" class="hud-menu-item current">
-                        <span class="hud-menu-icon">🚪</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
-                            <span class="hud-menu-sub">โถงกลางหน้าลิฟต์</span>
-                        </div>
+                        <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
                         <span class="hud-current-badge">ตำแหน่งนี้</span>
                     </a>
                     <a href="../floor01/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏢</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 01)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
                     </a>
                     <a href="../floor02/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🛋️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 2</span>
-                            <span class="hud-menu-sub">ห้องสมุด & Student Lounge</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 2</span>
                     </a>
                     <a href="../floor03/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🔬</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 3</span>
-                            <span class="hud-menu-sub">ห้องเรียน & ห้องปฏิบัติการ</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 3</span>
                     </a>
                     <a href="../floor04/" class="hud-menu-item">
-                        <span class="hud-menu-icon">📚</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 4</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 04)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 4</span>
                     </a>
                     <a href="../floor05/" class="hud-menu-item">
-                        <span class="hud-menu-icon">💻</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 5</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 05)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 5</span>
                     </a>
                 </div>
             </div>
@@ -188,7 +156,7 @@
                 <span>🗺️</span>
                 <span>แผนที่ 3D</span>
             </a>
-            <button class="hud-btn" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)">
+            <button class="hud-btn" id="btn-hotspot-editor" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)" style="display: none !important;">
                 <span>📍</span>
                 <span>Hotspot</span>
             </button>
@@ -202,7 +170,7 @@
         </div>
 
         <!-- Doorway Prompt for Floor01 -->
-        <div id="door-floor01-prompt" onclick="if(window.portalToFloor01) window.portalToFloor01();" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(10, 15, 30, 0.92); border: 2px solid #38bdf8; box-shadow: 0 0 24px rgba(56, 189, 248, 0.5); backdrop-filter: blur(16px); color: #fff; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 700; display: none; align-items: center; gap: 10px; z-index: 200; cursor: pointer; animation: pulse-door 1.8s infinite ease-in-out;">
+        <div id="door-floor01-prompt" onclick="if(window.portalToFloor01) window.portalToFloor01();" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.96); border: 2px solid #f97316; box-shadow: 0 0 24px rgba(249, 115, 22, 0.55); backdrop-filter: blur(16px); color: #ea580c; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 700; display: none; align-items: center; gap: 10px; z-index: 200; cursor: pointer; animation: pulse-door 1.8s infinite ease-in-out;">
             <span>🚪</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อเข้าสู่ Floor 01 (ชั้น 1 ด้านใน)</span>
         </div>
@@ -220,7 +188,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <!-- HOTSPOT ADMIN EDITOR — Press Ctrl+H to open -->
     <!-- ═══════════════════════════════════════════ -->
-    <div id="hotspot-editor" class="hs-editor-panel">
+    <div id="hotspot-editor" class="hs-editor-panel" style="display: none;">
 
         <!-- Panel Header -->
         <div class="hs-panel-header">
@@ -228,7 +196,7 @@
                 <div style="font-size:15px; font-weight:800; color:#38bdf8; letter-spacing:0.5px;">📍 Hotspot Editor (โถงกลางชั้น 1)</div>
                 <div class="hs-panel-subtitle">Admin Tool — กด Ctrl+H เพื่อเปิด/ปิด</div>
             </div>
-            <button onclick="window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
+            <button onclick="window.closeHotspotEditor ? window.closeHotspotEditor() : window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
         </div>
 
         <!-- Current Position Box -->
@@ -293,7 +261,7 @@
 
     <!-- Hotspot Editor Toggle Button (floating bottom-right) -->
     <button id="hs-editor-toggle-btn" onclick="window.toggleHotspotEditor()" title="เปิด Hotspot Editor (Ctrl+H)"
-        class="hs-toggle-btn">
+        class="hs-toggle-btn" style="display: none;">
         📍
     </button>
 
@@ -322,26 +290,93 @@
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
         }
 
+        // ── Admin Mode Logic ──
+        var urlParams = new URLSearchParams(window.location.search);
+        var isAdmin = urlParams.has('admin') || urlParams.has('edit');
+        if (!isAdmin) {
+            try { sessionStorage.removeItem('admin_mode'); } catch (e) {}
+        }
+
+        function updateAdminVisibility() {
+            var hudBtn = document.getElementById('btn-hotspot-editor');
+            var floatBtn = document.getElementById('hs-editor-toggle-btn');
+            var panel = document.getElementById('hotspot-editor');
+            if (hudBtn) {
+                if (isAdmin) {
+                    hudBtn.style.setProperty('display', 'inline-flex', 'important');
+                    hudBtn.classList.add('admin-visible');
+                } else {
+                    hudBtn.style.setProperty('display', 'none', 'important');
+                    hudBtn.classList.remove('admin-visible');
+                }
+            }
+            if (floatBtn) {
+                if (isAdmin && !editorOpen) {
+                    floatBtn.style.setProperty('display', 'flex', 'important');
+                } else {
+                    floatBtn.style.setProperty('display', 'none', 'important');
+                }
+            }
+            if (!isAdmin) {
+                editorOpen = false;
+                if (panel) panel.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        window.closeHotspotEditor = function() {
+            editorOpen = false;
+            var panel = document.getElementById('hotspot-editor');
+            var btn   = document.getElementById('hs-editor-toggle-btn');
+            if (panel) panel.style.setProperty('display', 'none', 'important');
+            if (btn) {
+                if (isAdmin) btn.style.setProperty('display', 'flex', 'important');
+                else btn.style.setProperty('display', 'none', 'important');
+            }
+        };
+
         window.toggleHotspotEditor = function () {
             editorOpen = !editorOpen;
             var panel = document.getElementById('hotspot-editor');
             var btn   = document.getElementById('hs-editor-toggle-btn');
-            if (panel) panel.style.display = editorOpen ? 'flex' : 'none';
-            if (btn)   btn.style.display   = editorOpen ? 'none' : 'flex';
+            if (panel) {
+                if (editorOpen) panel.style.setProperty('display', 'flex', 'important');
+                else panel.style.setProperty('display', 'none', 'important');
+            }
+            if (btn) {
+                if (isAdmin && !editorOpen) btn.style.setProperty('display', 'flex', 'important');
+                else btn.style.setProperty('display', 'none', 'important');
+            }
             if (editorOpen) renderList();
         };
 
         window.addEventListener('hotspot-editor-ready', function () {
-            var btn = document.getElementById('hs-editor-toggle-btn');
-            if (btn) btn.style.display = 'flex';
+            updateAdminVisibility();
         });
 
+        // Keyboard Shortcuts
         document.addEventListener('keydown', function (e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+            // Secret shortcut: Ctrl + Shift + H toggles Admin Mode
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+                e.preventDefault();
+                isAdmin = !isAdmin;
+                updateAdminVisibility();
+                if (isAdmin && !editorOpen) {
+                    window.toggleHotspotEditor();
+                } else if (!isAdmin && editorOpen) {
+                    window.closeHotspotEditor();
+                }
+                return;
+            }
+            // Normal shortcut: Ctrl + H toggles editor only if already Admin
+            if (isAdmin && (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
                 e.preventDefault();
                 window.toggleHotspotEditor();
             }
         });
+
+        // Force initial closed state
+        window.closeHotspotEditor();
+        updateAdminVisibility();
 
         setInterval(function () {
             if (!editorOpen) return;

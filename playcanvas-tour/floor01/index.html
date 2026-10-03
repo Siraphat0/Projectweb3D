@@ -117,64 +117,32 @@
                             clip-rule="evenodd" />
                     </svg>
                 </button>
-                                <div class="hud-dropdown-menu">
+                <div class="hud-dropdown-menu">
                     <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
                     <a href="../home/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏠</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าโฮม</span>
-                            <span class="hud-menu-sub">หน้าแรกของระบบ Virtual Tour</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าโฮม</span>
                     </a>
                     <a href="../" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏛️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
-                            <span class="hud-menu-sub">ทางเข้าด้านหน้าอาคาร SC.09</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
                     </a>
                     <a href="../inside/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🚪</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
-                            <span class="hud-menu-sub">โถงกลางหน้าลิฟต์</span>
-                        </div>
+                        <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
                     </a>
                     <a href="./" class="hud-menu-item current">
-                        <span class="hud-menu-icon">🏢</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 01)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
                         <span class="hud-current-badge">ตำแหน่งนี้</span>
                     </a>
                     <a href="../floor02/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🛋️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 2</span>
-                            <span class="hud-menu-sub">ห้องสมุด & Student Lounge</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 2</span>
                     </a>
                     <a href="../floor03/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🔬</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 3</span>
-                            <span class="hud-menu-sub">ห้องเรียน & ห้องปฏิบัติการ</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 3</span>
                     </a>
                     <a href="../floor04/" class="hud-menu-item">
-                        <span class="hud-menu-icon">📚</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 4</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 04)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 4</span>
                     </a>
                     <a href="../floor05/" class="hud-menu-item">
-                        <span class="hud-menu-icon">💻</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 5</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 05)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 5</span>
                     </a>
                 </div>
             </div>
@@ -188,7 +156,7 @@
 
                 <span>แผนที่ 3D</span>
             </a>
-            <button class="hud-btn" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)">
+            <button class="hud-btn" id="btn-hotspot-editor" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)" style="display: none !important;">
                 <span>📍</span>
                 <span>Hotspot</span>
             </button>
@@ -203,11 +171,7 @@
 
 
 
-        <!-- Elevator Prompt Banner (E key near elevator) -->
-        <div id="elevator-prompt" class="elevator-prompt-bar" onclick="if(window.showElevatorModal) window.showElevatorModal();" style="cursor:pointer;">
-            <span>🛗</span>
-            <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 2, 3, 4, 5)</span>
-        </div>
+
 
         <!-- Elevator Floor Selector Modal -->
         <div id="elevator-modal" class="elevator-modal-overlay">
@@ -251,7 +215,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <!-- HOTSPOT ADMIN EDITOR — Press Ctrl+H to open -->
     <!-- ═══════════════════════════════════════════ -->
-    <div id="hotspot-editor" class="hs-editor-panel">
+    <div id="hotspot-editor" class="hs-editor-panel" style="display: none;">
 
         <!-- Panel Header -->
         <div class="hs-panel-header">
@@ -259,7 +223,7 @@
                 <div class="hs-panel-title">📍 Hotspot Editor</div>
                 <div class="hs-panel-subtitle">Admin Tool — กด Ctrl+H เพื่อเปิด/ปิด</div>
             </div>
-            <button onclick="window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
+            <button onclick="window.closeHotspotEditor ? window.closeHotspotEditor() : window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
         </div>
 
         <!-- Current Position Box -->
@@ -326,7 +290,8 @@
     <button id="hs-editor-toggle-btn"
         onclick="window.toggleHotspotEditor()"
         title="เปิด Hotspot Editor (Ctrl+H)"
-        class="hs-toggle-btn">
+        class="hs-toggle-btn"
+        style="display: none;">
         📍
     </button>
 
@@ -343,12 +308,21 @@
         var pendingPos = null;
         var hotspots = [];
         var STORAGE_KEY = 'floor01_hotspots_v1';
-        var DEFAULT_HOTSPOTS = [{"id": "hs_1790865753234", "name": "ติดต่อฝ่ายวิชาการ/ธุรการ", "hint": "คลิกเพื่อดูข้อมูลนักศึกษา", "icon": "📍", "url": "https://computing.kku.ac.th/students", "prox": 3, "pos": {"x": -7.117, "y": 3.34, "z": -3.903}}, {"id": "hs_1790865815184", "name": "ห้อง9127", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9127/", "prox": 3, "pos": {"x": -26.087, "y": 3.34, "z": -20.398}}, {"id": "hs_1790938266824", "name": "ลิฟต์ชั้น1", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": 10.533, "y": 3.34, "z": -2.68}}];
+        var DEFAULT_HOTSPOTS = [{"id": "hs_1790865753234", "name": "ติดต่อฝ่ายวิชาการ/ธุรการ", "hint": "คลิกเพื่อดูข้อมูลนักศึกษา", "icon": "📍", "url": "https://computing.kku.ac.th/students", "prox": 3, "pos": {"x": -7.117, "y": 3.34, "z": -3.903}}, {"id": "hs_1790865815184", "name": "ห้อง9127", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9127/", "prox": 3, "pos": {"x": -26.087, "y": 3.34, "z": -20.398}}, {"id": "hs_1790938266824", "name": "ลิฟต์ชั้น 1", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3.5, "pos": {"x": 10.533, "y": 3.34, "z": -2.68}}];
 
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 hotspots = JSON.parse(saved);
+                if (Array.isArray(hotspots)) {
+                    hotspots.forEach(function (h) {
+                        if (h && (h.id === 'hs_1790938266824' || (h.name && h.name.indexOf('ลิฟต์') !== -1))) {
+                            h.pos = { x: 10.533, y: 3.34, z: -2.68 };
+                            h.name = 'ลิฟต์ชั้น 1';
+                        }
+                    });
+                    saveToStorage();
+                }
             }
             if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
@@ -362,28 +336,94 @@
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
         }
 
+        // ── Admin Mode Logic ──
+        var urlParams = new URLSearchParams(window.location.search);
+        var isAdmin = urlParams.has('admin') || urlParams.has('edit');
+        if (!isAdmin) {
+            try { sessionStorage.removeItem('admin_mode'); } catch (e) {}
+        }
+
+        function updateAdminVisibility() {
+            var hudBtn = document.getElementById('btn-hotspot-editor');
+            var floatBtn = document.getElementById('hs-editor-toggle-btn');
+            var panel = document.getElementById('hotspot-editor');
+            if (hudBtn) {
+                if (isAdmin) {
+                    hudBtn.style.setProperty('display', 'inline-flex', 'important');
+                    hudBtn.classList.add('admin-visible');
+                } else {
+                    hudBtn.style.setProperty('display', 'none', 'important');
+                    hudBtn.classList.remove('admin-visible');
+                }
+            }
+            if (floatBtn) {
+                if (isAdmin && !editorOpen) {
+                    floatBtn.style.setProperty('display', 'flex', 'important');
+                } else {
+                    floatBtn.style.setProperty('display', 'none', 'important');
+                }
+            }
+            if (!isAdmin) {
+                editorOpen = false;
+                if (panel) panel.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        window.closeHotspotEditor = function() {
+            editorOpen = false;
+            var panel = document.getElementById('hotspot-editor');
+            var btn   = document.getElementById('hs-editor-toggle-btn');
+            if (panel) panel.style.setProperty('display', 'none', 'important');
+            if (btn) {
+                if (isAdmin) btn.style.setProperty('display', 'flex', 'important');
+                else btn.style.setProperty('display', 'none', 'important');
+            }
+        };
+
         window.toggleHotspotEditor = function() {
             editorOpen = !editorOpen;
             var panel = document.getElementById('hotspot-editor');
             var btn   = document.getElementById('hs-editor-toggle-btn');
-            if (panel) panel.style.display = editorOpen ? 'flex' : 'none';
-            if (btn)   btn.style.display   = editorOpen ? 'none' : 'flex';
+            if (panel) {
+                if (editorOpen) panel.style.setProperty('display', 'flex', 'important');
+                else panel.style.setProperty('display', 'none', 'important');
+            }
+            if (btn) {
+                if (isAdmin && !editorOpen) btn.style.setProperty('display', 'flex', 'important');
+                else btn.style.setProperty('display', 'none', 'important');
+            }
             if (editorOpen) renderList();
         };
 
-        // Show toggle button when HUD is visible
+        // Show toggle button when HUD is visible (admin only)
         window.addEventListener('hotspot-editor-ready', function() {
-            var btn = document.getElementById('hs-editor-toggle-btn');
-            if (btn) btn.style.display = 'flex';
+            updateAdminVisibility();
         });
 
-        // Ctrl+H to toggle
+        // Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'h') {
+            // Secret shortcut: Ctrl + Shift + H toggles Admin Mode
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+                e.preventDefault();
+                isAdmin = !isAdmin;
+                updateAdminVisibility();
+                if (isAdmin && !editorOpen) {
+                    window.toggleHotspotEditor();
+                } else if (!isAdmin && editorOpen) {
+                    window.closeHotspotEditor();
+                }
+                return;
+            }
+            // Normal shortcut: Ctrl + H toggles editor only if already Admin
+            if (isAdmin && (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
                 e.preventDefault();
                 window.toggleHotspotEditor();
             }
         });
+
+        // Force initial closed state
+        window.closeHotspotEditor();
+        updateAdminVisibility();
 
         // Capture player position
         window.hotspotEditorCapture = function() {

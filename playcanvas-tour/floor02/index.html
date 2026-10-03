@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="th">
+
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
+    <meta name='viewport'
+        content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
     <meta charset='utf-8'>
     <title>Virtual Tour — อาคารวิทยวิภาส (SC.09) | ชั้น 2 (Floor 02)</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
@@ -11,40 +13,41 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style></style>
     <link rel="manifest" href="manifest.json">
-    
+
     <script src="playcanvas-stable.min.js"></script>
     <script src="__settings__.js"></script>
 
     <!-- Dropdown Interaction Script -->
     <script>
-    window.toggleFloorDropdown = function(e) {
-        if (e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-        var wrap = document.getElementById('hudFloorDropdown');
-        if (wrap) {
-            wrap.classList.toggle('open');
-            document.body.classList.toggle('floor-menu-open', wrap.classList.contains('open'));
-        }
-    };
-    window.addEventListener('click', function(e) {
-        var wrap = document.getElementById('hudFloorDropdown');
-        if (wrap && !wrap.contains(e.target)) {
-            wrap.classList.remove('open');
-            document.body.classList.remove('floor-menu-open');
-        }
-    });
-    window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
+        window.toggleFloorDropdown = function (e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
             var wrap = document.getElementById('hudFloorDropdown');
-            if (wrap) wrap.classList.remove('open');
-            document.body.classList.remove('floor-menu-open');
-        }
-    });
+            if (wrap) {
+                wrap.classList.toggle('open');
+                document.body.classList.toggle('floor-menu-open', wrap.classList.contains('open'));
+            }
+        };
+        window.addEventListener('click', function (e) {
+            var wrap = document.getElementById('hudFloorDropdown');
+            if (wrap && !wrap.contains(e.target)) {
+                wrap.classList.remove('open');
+                document.body.classList.remove('floor-menu-open');
+            }
+        });
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                var wrap = document.getElementById('hudFloorDropdown');
+                if (wrap) wrap.classList.remove('open');
+                document.body.classList.remove('floor-menu-open');
+            }
+        });
     </script>
 
 </head>
+
 <body>
     <!-- Portal Transition Fade Overlay -->
     <div id="portal-fade"></div>
@@ -67,7 +70,7 @@
             </h1>
             <div class="divider"></div>
             <p class="subtitle">
-                วิทยาลัยการคอมพิวเตอร์<br/>
+                วิทยาลัยการคอมพิวเตอร์<br />
                 มหาวิทยาลัยขอนแก่น
             </p>
 
@@ -101,80 +104,53 @@
             </div>
         </div>
 
-                <div class="hud-top-right">
+        <div class="hud-top-right">
             <!-- Floor Selection Dropdown (Human-Crafted Minimal) -->
             <div class="hud-dropdown-wrap" id="hudFloorDropdown">
-                <button class="hud-btn hud-btn-dropdown" onclick="toggleFloorDropdown(event)" title="เลือกชั้น / จุดสำรวจ">
-                    <span class="hud-btn-icon">🛋️</span>
+                <button class="hud-btn hud-btn-dropdown" onclick="toggleFloorDropdown(event)"
+                    title="เลือกชั้น / จุดสำรวจ">
+
                     <span class="hud-btn-label">ชั้น 2</span>
                     <svg class="hud-caret" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
                     </svg>
                 </button>
-                                <div class="hud-dropdown-menu">
+                <div class="hud-dropdown-menu">
                     <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
                     <a href="../home/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏠</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าโฮม</span>
-                            <span class="hud-menu-sub">หน้าแรกของระบบ Virtual Tour</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าโฮม</span>
                     </a>
                     <a href="../" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏛️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
-                            <span class="hud-menu-sub">ทางเข้าด้านหน้าอาคาร SC.09</span>
-                        </div>
+                        <span class="hud-menu-title">หน้าตึก (ภายนอก)</span>
                     </a>
                     <a href="../inside/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🚪</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
-                            <span class="hud-menu-sub">โถงกลางหน้าลิฟต์</span>
-                        </div>
+                        <span class="hud-menu-title">โถงต้อนรับ ชั้น 1</span>
                     </a>
                     <a href="../floor01/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🏢</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 01)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 1 ด้านใน</span>
                     </a>
                     <a href="./" class="hud-menu-item current">
-                        <span class="hud-menu-icon">🛋️</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 2</span>
-                            <span class="hud-menu-sub">ห้องสมุด & Student Lounge</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 2</span>
                         <span class="hud-current-badge">ตำแหน่งนี้</span>
                     </a>
                     <a href="../floor03/" class="hud-menu-item">
-                        <span class="hud-menu-icon">🔬</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 3</span>
-                            <span class="hud-menu-sub">ห้องเรียน & ห้องปฏิบัติการ</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 3</span>
                     </a>
                     <a href="../floor04/" class="hud-menu-item">
-                        <span class="hud-menu-icon">📚</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 4</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 04)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 4</span>
                     </a>
                     <a href="../floor05/" class="hud-menu-item">
-                        <span class="hud-menu-icon">💻</span>
-                        <div class="hud-menu-content">
-                            <span class="hud-menu-title">ชั้น 5</span>
-                            <span class="hud-menu-sub">ทางเดินหลัก (Floor 05)</span>
-                        </div>
+                        <span class="hud-menu-title">ชั้น 5</span>
                     </a>
                 </div>
             </div>
 
             <!-- Utility Buttons -->
-            <button class="hud-btn" id="btn-nav-guide" onclick="window.toggleNavMenu && window.toggleNavMenu();" title="ระบบนำทางไปยังจุดต่างๆ" style="background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(2,132,199,0.35)); border-color:rgba(56,189,248,0.5);">
+            <button class="hud-btn" id="btn-nav-guide" onclick="window.toggleNavMenu && window.toggleNavMenu();"
+                title="ระบบนำทางไปยังจุดต่างๆ"
+                style="background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(2,132,199,0.35)); border-color:rgba(56,189,248,0.5);">
                 <span>🧭</span>
                 <span>นำทาง</span>
             </button>
@@ -182,7 +158,9 @@
                 <span>🗺️</span>
                 <span>แผนที่ 3D</span>
             </a>
-            <button class="hud-btn" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)">
+            <button class="hud-btn" id="btn-hotspot-editor"
+                onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();"
+                title="เครื่องมือวาง Hotspot (Ctrl+H)" style="display: none !important;">
                 <span>📍</span>
                 <span>Hotspot</span>
             </button>
@@ -197,11 +175,7 @@
 
 
 
-        <!-- Elevator / Stairs Prompt for Going Down -->
-        <div id="elevator-prompt" class="elevator-prompt-bar" onclick="if(window.showElevatorModal) window.showElevatorModal();" style="cursor:pointer;">
-            <span>🛗</span>
-            <span>กด [E] หรือคลิกตรงนี้เพื่อเลือกชั้นลิฟต์ (ไปชั้น 1, 3, 4, 5)</span>
-        </div>
+
 
         <!-- Elevator Floor Selector Modal -->
         <div id="elevator-modal" class="elevator-modal-overlay">
@@ -210,23 +184,29 @@
                 <h3 class="elevator-modal-title">ลิฟต์อาคาร SC.09</h3>
                 <p class="elevator-modal-sub">คุณอยู่ที่: ชั้น 2 (Floor 02)</p>
                 <div class="elevator-modal-list">
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor05 && window.portalToFloor05();" >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor05 && window.portalToFloor05();">
                         🔺 ขึ้นชั้น 5 (Floor 05)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor04 && window.portalToFloor04();" >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor04 && window.portalToFloor04();">
                         🔺 ขึ้นชั้น 4 (Floor 04)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor03 && window.portalToFloor03();" >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor03 && window.portalToFloor03();">
                         🔺 ขึ้นชั้น 3 (Floor 03)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor01 && window.portalToFloor01();" >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor01 && window.portalToFloor01();">
                         🔻 ลงชั้น 1 ด้านใน (Floor 01)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToInside && window.portalToInside();" >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToInside && window.portalToInside();">
                         🏛️ ลงโถงกลางชั้น 1 (Main Lobby)
                     </button>
                 </div>
-                <button class="elevator-modal-close" onclick="document.getElementById('elevator-modal').style.display='none';">✕ ปิดหน้าต่าง</button>
+                <button class="elevator-modal-close"
+                    onclick="document.getElementById('elevator-modal').style.display='none';">✕ ปิดหน้าต่าง</button>
             </div>
         </div>
 
@@ -241,15 +221,17 @@
     <!-- ═══════════════════════════════════════════ -->
     <!-- HOTSPOT ADMIN EDITOR — Press Ctrl+H to open -->
     <!-- ═══════════════════════════════════════════ -->
-    <div id="hotspot-editor" class="hs-editor-panel">
+    <div id="hotspot-editor" class="hs-editor-panel" style="display: none;">
 
         <!-- Panel Header -->
         <div class="hs-panel-header">
             <div>
-                <div style="font-size:15px; font-weight:800; color:#38bdf8; letter-spacing:0.5px;">📍 Hotspot Editor (ชั้น 2)</div>
+                <div style="font-size:15px; font-weight:800; color:#38bdf8; letter-spacing:0.5px;">📍 Hotspot Editor
+                    (ชั้น 2)</div>
                 <div class="hs-panel-subtitle">Admin Tool — กด Ctrl+H เพื่อเปิด/ปิด</div>
             </div>
-            <button onclick="window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
+            <button onclick="window.closeHotspotEditor ? window.closeHotspotEditor() : window.toggleHotspotEditor()"
+                class="hs-close-btn">✕ ปิด</button>
         </div>
 
         <!-- Current Position Box -->
@@ -266,11 +248,13 @@
             <div class="hs-form-title">⚙️ ตั้งค่า Hotspot ใหม่</div>
             <div class="hs-form-grid">
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ชื่อห้อง / จุด</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ชื่อห้อง /
+                        จุด</label>
                     <input id="hs-name" type="text" placeholder="เช่น ห้องแล็บ 1" class="hs-input">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">คำอธิบาย (hint)</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">คำอธิบาย
+                        (hint)</label>
                     <input id="hs-hint" type="text" placeholder="เช่น กด [E] หรือคลิกเพื่อเข้าห้อง" class="hs-input">
                 </div>
                 <div>
@@ -278,11 +262,13 @@
                     <input id="hs-icon" type="text" value="🚪" class="hs-input">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">URL ปลายทาง (ปล่อยว่างถ้าไม่มี)</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">URL ปลายทาง
+                        (ปล่อยว่างถ้าไม่มี)</label>
                     <input id="hs-url" type="text" placeholder="เช่น ../floor01/ หรือ URL เว็บไซต์" class="hs-input">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ระยะใกล้ Prompt (เมตร)</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ระยะใกล้ Prompt
+                        (เมตร)</label>
                     <input id="hs-prox" type="number" value="3.0" step="0.5" min="0.5" class="hs-input">
                 </div>
                 <div style="display:flex; gap:8px; margin-top:4px;">
@@ -294,9 +280,12 @@
 
         <!-- Hotspot List -->
         <div class="hs-list-section">
-            <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">📋 รายการ Hotspots ชั้น 2</div>
+            <div
+                style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+                📋 รายการ Hotspots ชั้น 2</div>
             <div id="hs-list">
-                <div style="font-size:12px; color:#475569; text-align:center; padding:20px 0;">ยังไม่มี Hotspot ที่สร้าง — กดปุ่มด้านบนเพื่อเพิ่ม</div>
+                <div style="font-size:12px; color:#475569; text-align:center; padding:20px 0;">ยังไม่มี Hotspot ที่สร้าง
+                    — กดปุ่มด้านบนเพื่อเพิ่ม</div>
             </div>
         </div>
 
@@ -307,176 +296,244 @@
             </button>
             <div id="hs-export-box" class="hs-export-box">
                 <textarea id="hs-export-text" readonly class="hs-export-textarea"></textarea>
-                <div style="font-size:11px; color:#10b981; margin-top:5px; text-align:center;">✅ คัดลอก Code นี้ไปวางใน __game-scripts.js ได้เลย</div>
+                <div style="font-size:11px; color:#10b981; margin-top:5px; text-align:center;">✅ คัดลอก Code นี้ไปวางใน
+                    __game-scripts.js ได้เลย</div>
             </div>
         </div>
     </div>
 
     <!-- Hotspot Editor Toggle Button (floating bottom-right) -->
     <button id="hs-editor-toggle-btn" onclick="window.toggleHotspotEditor()" title="เปิด Hotspot Editor (Ctrl+H)"
-        class="hs-toggle-btn">
+        class="hs-toggle-btn" style="display: none;">
         📍
     </button>
 
     <script>
-    (function () {
-        var editorOpen = false;
-        var pendingPos = null;
-        var hotspots = [];
-        var STORAGE_KEY = 'floor02_hotspots_v1';
-        var DEFAULT_HOTSPOTS = [{"id": "hs_1790938242545", "name": "ลิฟต์ชั้น2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": -7.844, "y": 0.55, "z": 2.04}}];
+        (function () {
+            var editorOpen = false;
+            var pendingPos = null;
+            var hotspots = [];
+            var STORAGE_KEY = 'floor02_hotspots_v1';
+            var DEFAULT_HOTSPOTS = [{ "id": "hs_1790938242545", "name": "ลิฟต์ชั้น2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": -7.844, "y": 0.55, "z": 2.04 } }];
 
-        try {
-            var saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                hotspots = JSON.parse(saved);
-                var prevLen = hotspots.length;
-                hotspots = hotspots.filter(function (h) {
-                    return h && h.id !== 'hs_elevator_floor02' && h.name !== 'ลิฟต์ชั้น 2';
-                });
-                if (hotspots.length !== prevLen) {
+            try {
+                var saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    hotspots = JSON.parse(saved);
+                    var prevLen = hotspots.length;
+                    hotspots = hotspots.filter(function (h) {
+                        return h && h.id !== 'hs_elevator_floor02' && h.name !== 'ลิฟต์ชั้น 2';
+                    });
+                    if (hotspots.length !== prevLen) {
+                        saveToStorage();
+                    }
+                }
+                if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                    hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
                     saveToStorage();
                 }
-            }
-            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+            } catch (e) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
-                saveToStorage();
             }
-        } catch (e) {
-            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
-        }
 
-        function saveToStorage() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
-        }
-
-        window.toggleHotspotEditor = function () {
-            editorOpen = !editorOpen;
-            var panel = document.getElementById('hotspot-editor');
-            var btn   = document.getElementById('hs-editor-toggle-btn');
-            if (panel) panel.style.display = editorOpen ? 'flex' : 'none';
-            if (btn)   btn.style.display   = editorOpen ? 'none' : 'flex';
-            if (editorOpen) renderList();
-        };
-
-        window.addEventListener('hotspot-editor-ready', function () {
-            var btn = document.getElementById('hs-editor-toggle-btn');
-            if (btn) btn.style.display = 'flex';
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
-                e.preventDefault();
-                window.toggleHotspotEditor();
+            function saveToStorage() {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) { }
             }
-        });
 
-        setInterval(function () {
-            if (!editorOpen) return;
-            var posEl = document.getElementById('hs-live-pos');
-            if (posEl && window._hotspotEditorGetPos) {
-                var p = window._hotspotEditorGetPos();
-                posEl.innerHTML = 'x: <b>' + p.x.toFixed(2) + '</b> &nbsp; y: <b>' + p.y.toFixed(2) + '</b> &nbsp; z: <b>' + p.z.toFixed(2) + '</b>';
+            // ── Admin Mode Logic ──
+            var urlParams = new URLSearchParams(window.location.search);
+            var isAdmin = urlParams.has('admin') || urlParams.has('edit');
+            if (!isAdmin) {
+                try { sessionStorage.removeItem('admin_mode'); } catch (e) { }
             }
-        }, 150);
 
-        window.hotspotEditorCapture = function () {
-            if (window._hotspotEditorGetPos) {
-                pendingPos = window._hotspotEditorGetPos();
-            } else {
-                var c = prompt('กรอกพิกัด x, y, z:', '0, 1.5, 0');
-                if (!c) return;
-                var pts = c.split(',').map(Number);
-                pendingPos = { x: pts[0]||0, y: pts[1]||1.5, z: pts[2]||0 };
+            function updateAdminVisibility() {
+                var hudBtn = document.getElementById('btn-hotspot-editor');
+                var floatBtn = document.getElementById('hs-editor-toggle-btn');
+                var panel = document.getElementById('hotspot-editor');
+                if (hudBtn) {
+                    if (isAdmin) {
+                        hudBtn.style.setProperty('display', 'inline-flex', 'important');
+                        hudBtn.classList.add('admin-visible');
+                    } else {
+                        hudBtn.style.setProperty('display', 'none', 'important');
+                        hudBtn.classList.remove('admin-visible');
+                    }
+                }
+                if (floatBtn) {
+                    if (isAdmin && !editorOpen) {
+                        floatBtn.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        floatBtn.style.setProperty('display', 'none', 'important');
+                    }
+                }
+                if (!isAdmin) {
+                    editorOpen = false;
+                    if (panel) panel.style.setProperty('display', 'none', 'important');
+                }
             }
-            if (!pendingPos) return;
 
-            document.getElementById('hs-form').style.display = 'block';
-            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
-            document.getElementById('hs-capture-btn').textContent = '✅ ตำแหน่งถูกบันทึก — กรอกข้อมูลด้านล่าง';
-        };
-
-        window.hotspotEditorCancelForm = function () {
-            pendingPos = null;
-            document.getElementById('hs-form').style.display = 'none';
-            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
-            document.getElementById('hs-capture-btn').textContent = '📍 วางจุด Hotspot ที่ตำแหน่งนี้';
-        };
-
-        window.hotspotEditorSave = function () {
-            if (!pendingPos) { alert('กด "วางจุด Hotspot" ก่อนนะครับ'); return; }
-            var name  = document.getElementById('hs-name').value.trim()  || 'Hotspot';
-            var hint  = document.getElementById('hs-hint').value.trim()  || 'กด [E] หรือคลิกเพื่อเข้า';
-            var icon  = document.getElementById('hs-icon').value.trim()  || '🚪';
-            var url   = document.getElementById('hs-url').value.trim()   || '#';
-            var prox  = parseFloat(document.getElementById('hs-prox').value) || 3.0;
-
-            var hs = {
-                id: 'hs_' + Date.now(),
-                name: name, hint: hint, icon: icon, url: url, prox: prox,
-                pos: { x: +pendingPos.x.toFixed(3), y: +pendingPos.y.toFixed(3), z: +pendingPos.z.toFixed(3) }
+            window.closeHotspotEditor = function () {
+                editorOpen = false;
+                var panel = document.getElementById('hotspot-editor');
+                var btn = document.getElementById('hs-editor-toggle-btn');
+                if (panel) panel.style.setProperty('display', 'none', 'important');
+                if (btn) {
+                    if (isAdmin) btn.style.setProperty('display', 'flex', 'important');
+                    else btn.style.setProperty('display', 'none', 'important');
+                }
             };
-            hotspots.push(hs);
-            saveToStorage();
 
-            if (window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
+            window.toggleHotspotEditor = function () {
+                editorOpen = !editorOpen;
+                var panel = document.getElementById('hotspot-editor');
+                var btn = document.getElementById('hs-editor-toggle-btn');
+                if (panel) {
+                    if (editorOpen) panel.style.setProperty('display', 'flex', 'important');
+                    else panel.style.setProperty('display', 'none', 'important');
+                }
+                if (btn) {
+                    if (isAdmin && !editorOpen) btn.style.setProperty('display', 'flex', 'important');
+                    else btn.style.setProperty('display', 'none', 'important');
+                }
+                if (editorOpen) renderList();
+            };
 
-            hotspotEditorCancelForm();
-            document.getElementById('hs-name').value = '';
-            document.getElementById('hs-hint').value = '';
-            document.getElementById('hs-url').value  = '';
-            renderList();
-        };
-
-        window.hotspotEditorDelete = function (id) {
-            hotspots = hotspots.filter(function (h) { return h.id !== id; });
-            saveToStorage();
-            if (window._hotspotEditorUnregister) window._hotspotEditorUnregister(id);
-            renderList();
-        };
-
-        window.hotspotEditorExport = function () {
-            var lines = hotspots.map(function (h) {
-                return '    {\n' +
-                    '        id: \'' + h.id + '\',\n' +
-                    '        worldPos: new pc.Vec3(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + '),\n' +
-                    '        name: \'' + h.name + '\',\n' +
-                    '        hint: \'' + h.hint + '\',\n' +
-                    '        icon: \'' + h.icon + '\',\n' +
-                    '        url:  \'' + h.url  + '\',\n' +
-                    '        prox: ' + h.prox + '\n' +
-                    '    }';
+            window.addEventListener('hotspot-editor-ready', function () {
+                updateAdminVisibility();
             });
-            var code = '// === วางใน __game-scripts.js ===\nthis.hotspots = [\n' + lines.join(',\n') + '\n];';
-            var box = document.getElementById('hs-export-box');
-            var txt = document.getElementById('hs-export-text');
-            if (box && txt) {
-                txt.value = code;
-                box.style.display = 'block';
-                navigator.clipboard.writeText(code).then(function () {
-                    alert('คัดลอก Code ลง Clipboard เรียบร้อย!');
-                }).catch(function () {});
-            }
-        };
 
-        function renderList() {
-            var listEl = document.getElementById('hs-list');
-            if (!listEl) return;
-            if (hotspots.length === 0) {
-                listEl.innerHTML = '<div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>';
-                return;
+            // Keyboard Shortcuts
+            document.addEventListener('keydown', function (e) {
+                // Secret shortcut: Ctrl + Shift + H toggles Admin Mode
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+                    e.preventDefault();
+                    isAdmin = !isAdmin;
+                    updateAdminVisibility();
+                    if (isAdmin && !editorOpen) {
+                        window.toggleHotspotEditor();
+                    } else if (!isAdmin && editorOpen) {
+                        window.closeHotspotEditor();
+                    }
+                    return;
+                }
+                // Normal shortcut: Ctrl + H toggles editor only if already Admin
+                if (isAdmin && (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
+                    e.preventDefault();
+                    window.toggleHotspotEditor();
+                }
+            });
+
+            // Force initial closed state
+            window.closeHotspotEditor();
+            updateAdminVisibility();
+
+            setInterval(function () {
+                if (!editorOpen) return;
+                var posEl = document.getElementById('hs-live-pos');
+                if (posEl && window._hotspotEditorGetPos) {
+                    var p = window._hotspotEditorGetPos();
+                    posEl.innerHTML = 'x: <b>' + p.x.toFixed(2) + '</b> &nbsp; y: <b>' + p.y.toFixed(2) + '</b> &nbsp; z: <b>' + p.z.toFixed(2) + '</b>';
+                }
+            }, 150);
+
+            window.hotspotEditorCapture = function () {
+                if (window._hotspotEditorGetPos) {
+                    pendingPos = window._hotspotEditorGetPos();
+                } else {
+                    var c = prompt('กรอกพิกัด x, y, z:', '0, 1.5, 0');
+                    if (!c) return;
+                    var pts = c.split(',').map(Number);
+                    pendingPos = { x: pts[0] || 0, y: pts[1] || 1.5, z: pts[2] || 0 };
+                }
+                if (!pendingPos) return;
+
+                document.getElementById('hs-form').style.display = 'block';
+                document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
+                document.getElementById('hs-capture-btn').textContent = '✅ ตำแหน่งถูกบันทึก — กรอกข้อมูลด้านล่าง';
+            };
+
+            window.hotspotEditorCancelForm = function () {
+                pendingPos = null;
+                document.getElementById('hs-form').style.display = 'none';
+                document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
+                document.getElementById('hs-capture-btn').textContent = '📍 วางจุด Hotspot ที่ตำแหน่งนี้';
+            };
+
+            window.hotspotEditorSave = function () {
+                if (!pendingPos) { alert('กด "วางจุด Hotspot" ก่อนนะครับ'); return; }
+                var name = document.getElementById('hs-name').value.trim() || 'Hotspot';
+                var hint = document.getElementById('hs-hint').value.trim() || 'กด [E] หรือคลิกเพื่อเข้า';
+                var icon = document.getElementById('hs-icon').value.trim() || '🚪';
+                var url = document.getElementById('hs-url').value.trim() || '#';
+                var prox = parseFloat(document.getElementById('hs-prox').value) || 3.0;
+
+                var hs = {
+                    id: 'hs_' + Date.now(),
+                    name: name, hint: hint, icon: icon, url: url, prox: prox,
+                    pos: { x: +pendingPos.x.toFixed(3), y: +pendingPos.y.toFixed(3), z: +pendingPos.z.toFixed(3) }
+                };
+                hotspots.push(hs);
+                saveToStorage();
+
+                if (window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
+
+                hotspotEditorCancelForm();
+                document.getElementById('hs-name').value = '';
+                document.getElementById('hs-hint').value = '';
+                document.getElementById('hs-url').value = '';
+                renderList();
+            };
+
+            window.hotspotEditorDelete = function (id) {
+                hotspots = hotspots.filter(function (h) { return h.id !== id; });
+                saveToStorage();
+                if (window._hotspotEditorUnregister) window._hotspotEditorUnregister(id);
+                renderList();
+            };
+
+            window.hotspotEditorExport = function () {
+                var lines = hotspots.map(function (h) {
+                    return '    {\n' +
+                        '        id: \'' + h.id + '\',\n' +
+                        '        worldPos: new pc.Vec3(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + '),\n' +
+                        '        name: \'' + h.name + '\',\n' +
+                        '        hint: \'' + h.hint + '\',\n' +
+                        '        icon: \'' + h.icon + '\',\n' +
+                        '        url:  \'' + h.url + '\',\n' +
+                        '        prox: ' + h.prox + '\n' +
+                        '    }';
+                });
+                var code = '// === วางใน __game-scripts.js ===\nthis.hotspots = [\n' + lines.join(',\n') + '\n];';
+                var box = document.getElementById('hs-export-box');
+                var txt = document.getElementById('hs-export-text');
+                if (box && txt) {
+                    txt.value = code;
+                    box.style.display = 'block';
+                    navigator.clipboard.writeText(code).then(function () {
+                        alert('คัดลอก Code ลง Clipboard เรียบร้อย!');
+                    }).catch(function () { });
+                }
+            };
+
+            function renderList() {
+                var listEl = document.getElementById('hs-list');
+                if (!listEl) return;
+                if (hotspots.length === 0) {
+                    listEl.innerHTML = '<div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>';
+                    return;
+                }
+                listEl.innerHTML = hotspots.map(function (h) {
+                    return '<div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">' +
+                        '  <div>' +
+                        '    <div style="font-size:13px; font-weight:700; color:#fff;">' + (h.icon || '📍') + ' ' + h.name + '</div>' +
+                        '    <div style="font-size:10px; color:#64748b; font-family:monospace; margin-top:2px;">(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + ')</div>' +
+                        '  </div>' +
+                        '  <button onclick="window.hotspotEditorDelete(\'' + h.id + '\')" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:6px; color:#ef4444; padding:4px 8px; cursor:pointer; font-size:11px;">ลบ</button>' +
+                        '</div>';
+                }).join('');
             }
-            listEl.innerHTML = hotspots.map(function (h) {
-                return '<div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">' +
-                    '  <div>' +
-                    '    <div style="font-size:13px; font-weight:700; color:#fff;">' + (h.icon||'📍') + ' ' + h.name + '</div>' +
-                    '    <div style="font-size:10px; color:#64748b; font-family:monospace; margin-top:2px;">(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + ')</div>' +
-                    '  </div>' +
-                    '  <button onclick="window.hotspotEditorDelete(\'' + h.id + '\')" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:6px; color:#ef4444; padding:4px 8px; cursor:pointer; font-size:11px;">ลบ</button>' +
-                    '</div>';
-            }).join('');
-        }
-    })();
+        })();
     </script>
 
     <script src="../nav-guide.js"></script>
@@ -484,4 +541,5 @@
     <script src="__start__.js"></script>
     <script src="__loading__.js"></script>
 </body>
+
 </html>

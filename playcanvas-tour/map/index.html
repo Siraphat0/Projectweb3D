@@ -14,8 +14,7 @@
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 
-    <!-- PlayCanvas Engine for .SOG Gaussian Splat -->
-    <script src="playcanvas-stable.min.js"></script>
+
 
     <style>
         * {
@@ -44,16 +43,7 @@
             z-index: 1;
         }
 
-        /* Layer 2: PlayCanvas SOG 3D Model Overlay (Transparent & Synchronized) */
-        #application-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none; /* Let all mouse/touch drag go to MapLibre */
-        }
+
 
         /* Top Header Card */
         .hud-header {
@@ -116,10 +106,10 @@
             border-radius: 50%;
             box-shadow: 0 0 6px #0284c7;
         }
-        .tag-sog {
-            background: #fdf2f8;
-            color: #db2777;
-            border: 1px solid #fbcfe8;
+        .tag-map {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         /* Top Right Controls */
@@ -316,90 +306,7 @@
             }
         }
 
-        /* 3D Model Alignment Calibration Drawer */
-        #calibrator-drawer {
-            position: absolute;
-            top: 74px;
-            right: 20px;
-            z-index: 101;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            padding: 16px 20px;
-            width: 290px;
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
-            color: #f1f5f9;
-            display: none;
-        }
-        #calibrator-drawer.open {
-            display: block;
-        }
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: #38bdf8;
-            margin-bottom: 12px;
-        }
-        .cal-row {
-            margin-bottom: 10px;
-        }
-        .cal-label {
-            font-size: 11px;
-            color: #94a3b8;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-        .cal-slider {
-            width: 100%;
-            accent-color: #38bdf8;
-            cursor: pointer;
-        }
-        .cal-btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-top: 10px;
-        }
-        .cal-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #cbd5e1;
-            border-radius: 8px;
-            padding: 6px;
-            font-family: inherit;
-            font-size: 11px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .cal-btn:hover {
-            background: rgba(56, 189, 248, 0.2);
-            color: #38bdf8;
-            border-color: #38bdf8;
-        }
 
-        /* Loading Indicator for SOG model */
-        #sog-badge {
-            position: absolute;
-            bottom: 28px;
-            right: 28px;
-            z-index: 100;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 12px;
-            color: #38bdf8;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
 
         /* Fullscreen Fade Transition */
         #portal-overlay {
@@ -423,8 +330,7 @@
     <!-- 1. MapLibre 3D Street Map Viewport -->
     <div id="map"></div>
 
-    <!-- 2. PlayCanvas SOG 3D Model Viewport (Transparent Layer on top of map) -->
-    <canvas id="application-canvas"></canvas>
+
 
     <!-- Portal Fade Transition -->
     <div id="portal-overlay"></div>
@@ -437,51 +343,16 @@
             <p>วิทยาลัยการคอมพิวเตอร์ • มหาวิทยาลัยขอนแก่น</p>
             <div class="hud-tags">
                 <span class="tag-pill tag-gps">📍 16.4757° N, 102.8251° E</span>
-                <span class="tag-pill tag-sog">🏢 3D .SOG Scan Active</span>
+                <span class="tag-pill tag-map">🗺️ 3D Campus Map</span>
             </div>
         </div>
     </div>
 
     <!-- Top Right Controls -->
     <div class="hud-top-right">
-        <button class="hud-btn" onclick="toggleCalibrator()" title="ปรับตำแหน่งและขนาดโมเดล 3D SOG">
-            ⚙️ ปรับแกนโมเดล 3D
-        </button>
         <button class="hud-btn" onclick="resetMapView()" title="รีเซ็ตมุมมองแผนที่">
             🎯 รีเซ็ตมุมมอง
         </button>
-    </div>
-
-    <!-- 3D Model Alignment Calibration Drawer -->
-    <div id="calibrator-drawer">
-        <div class="drawer-header">
-            <span>⚙️ ปรับตำแหน่งโมเดล 3D SOG</span>
-            <span style="cursor:pointer;" onclick="toggleCalibrator()">✕</span>
-        </div>
-        <div class="cal-row">
-            <div class="cal-label"><span>ขนาดสเกล (Scale)</span><span id="txt-scale">15.0x</span></div>
-            <input type="range" class="cal-slider" id="slider-scale" min="1" max="40" value="15" step="0.5">
-        </div>
-        <div class="cal-row">
-            <div class="cal-label"><span>หมุนทิศทาง (Yaw)</span><span id="txt-yaw">0°</span></div>
-            <input type="range" class="cal-slider" id="slider-yaw" min="-180" max="180" value="0" step="1">
-        </div>
-        <div class="cal-row">
-            <div class="cal-label"><span>ระดับความสูง (Height)</span><span id="txt-height">0.0m</span></div>
-            <input type="range" class="cal-slider" id="slider-height" min="-40" max="40" value="0" step="0.5">
-        </div>
-        <div class="cal-row">
-            <div class="cal-label"><span>เลื่อนแกน X (East/West)</span><span id="txt-pos-x">0.0m</span></div>
-            <input type="range" class="cal-slider" id="slider-pos-x" min="-100" max="100" value="0" step="0.5">
-        </div>
-        <div class="cal-row">
-            <div class="cal-label"><span>เลื่อนแกน Z (North/South)</span><span id="txt-pos-z">0.0m</span></div>
-            <input type="range" class="cal-slider" id="slider-pos-z" min="-100" max="100" value="0" step="0.5">
-        </div>
-        <div class="cal-btn-grid">
-            <button class="cal-btn" onclick="rotateYaw90()">↻ หมุน 90°</button>
-            <button class="cal-btn" onclick="resetCalibration()">↺ คืนค่าเดิม</button>
-        </div>
     </div>
 
     <!-- PRIMARY HERO DOCK: MOVE TO FLOOR 01 -->
@@ -517,11 +388,7 @@
         </div>
     </div>
 
-    <!-- SOG Status Badge -->
-    <div id="sog-badge">
-        <span id="sog-dot" style="width:8px; height:8px; background:#eab308; border-radius:50%; display:inline-block;"></span>
-        <span id="sog-txt">กำลังโหลดโมเดล 3D UAV.sog...</span>
-    </div>
+
 
     <script>
         // Exact Geographical Center of SC.09 Khon Kaen University
@@ -582,178 +449,11 @@
             .addTo(map);
         });
 
-        // --- 2. Initialize PlayCanvas Engine (Transparent Canvas Over Map) ---
-        const canvas = document.getElementById('application-canvas');
-        const app = new pc.Application(canvas, {
-            graphicsDeviceOptions: {
-                alpha: true,
-                antialias: true,
-                preserveDrawingBuffer: false,
-                powerPreference: 'high-performance'
-            }
-        });
-
-        app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
-        app.setCanvasResolution(pc.RESOLUTION_AUTO);
-
         window.addEventListener('resize', () => {
-            app.resizeCanvas();
             map.resize();
         });
 
-        // Transparent background so MapLibre street map shines through
-        app.scene.ambientLight = new pc.Color(0.9, 0.9, 0.95);
-
-        // Camera Entity
-        const cameraEntity = new pc.Entity('OverlayCamera');
-        cameraEntity.addComponent('camera', {
-            clearColor: new pc.Color(0, 0, 0, 0), // Transparent!
-            farClip: 3000,
-            nearClip: 0.1,
-            fov: 36.87 // Matches MapLibre standard FOV
-        });
-        app.root.addChild(cameraEntity);
-
-        // Sun & Ambient lights for the splat
-        const sun = new pc.Entity('SunLight');
-        sun.addComponent('light', {
-            type: 'directional',
-            color: new pc.Color(1, 0.98, 0.92),
-            intensity: 1.5
-        });
-        sun.setEulerAngles(55, 30, 0);
-        app.root.addChild(sun);
-
-        app.start();
-
-        // --- 3. Load & Position .SOG 3D Building Model ---
-        const buildingRoot = new pc.Entity('BuildingRoot');
-        app.root.addChild(buildingRoot);
-
-        let buildingEntity = null;
-
-        // Calibration settings
-        const calibration = {
-            scale: parseFloat(localStorage.getItem('kku_sog_scale') || '15.0'),
-            yaw: parseFloat(localStorage.getItem('kku_sog_yaw') || '0'),
-            height: parseFloat(localStorage.getItem('kku_sog_height') || '0'),
-            posX: parseFloat(localStorage.getItem('kku_sog_posx') || '0'),
-            posZ: parseFloat(localStorage.getItem('kku_sog_posz') || '0'),
-        };
-
-        function updateCalibrationUI() {
-            document.getElementById('slider-scale').value = calibration.scale;
-            document.getElementById('slider-yaw').value = calibration.yaw;
-            document.getElementById('slider-height').value = calibration.height;
-            document.getElementById('slider-pos-x').value = calibration.posX;
-            document.getElementById('slider-pos-z').value = calibration.posZ;
-
-            document.getElementById('txt-scale').textContent = calibration.scale.toFixed(2) + 'x';
-            document.getElementById('txt-yaw').textContent = calibration.yaw + '°';
-            document.getElementById('txt-height').textContent = calibration.height.toFixed(1) + 'm';
-            document.getElementById('txt-pos-x').textContent = calibration.posX.toFixed(1) + 'm';
-            document.getElementById('txt-pos-z').textContent = calibration.posZ.toFixed(1) + 'm';
-
-            if (buildingEntity) {
-                buildingRoot.setLocalScale(calibration.scale, calibration.scale, calibration.scale);
-                buildingRoot.setEulerAngles(0, calibration.yaw, 0);
-                buildingRoot.setLocalPosition(calibration.posX, calibration.height, calibration.posZ);
-            }
-        }
-
-        const sogAsset = new pc.Asset('UAV_Exterior', 'gsplat', {
-            url: './UAV.sog'
-        });
-
-        app.assets.add(sogAsset);
-
-        sogAsset.on('load', (asset) => {
-            const sogDot = document.getElementById('sog-dot');
-            const sogTxt = document.getElementById('sog-txt');
-            if (sogDot) sogDot.style.background = '#22c55e';
-            if (sogTxt) sogTxt.textContent = 'โมเดล 3D UAV.sog วางบนอาคารแล้ว ✅';
-
-            buildingEntity = new pc.Entity('SogBuildingModel');
-            buildingEntity.addComponent('gsplat', {
-                asset: asset
-            });
-
-            // Splat inversion correction for OpenCV coordinates
-            buildingEntity.setEulerAngles(0, 0, 180);
-            buildingRoot.addChild(buildingEntity);
-
-            // Auto-align splat base to ground level
-            setTimeout(() => {
-                try {
-                    const instance = buildingEntity.gsplat?.instance;
-                    if (instance && instance.meshInstance && instance.meshInstance.aabb) {
-                        const aabb = instance.meshInstance.aabb;
-                        const minY = aabb.center.y - aabb.halfExtents.y;
-                        buildingEntity.setLocalPosition(0, -minY, 0);
-                    }
-                } catch(e) {}
-                updateCalibrationUI();
-            }, 200);
-        });
-
-        sogAsset.on('error', (err) => {
-            console.error('Failed to load UAV.sog:', err);
-            const sogDot = document.getElementById('sog-dot');
-            const sogTxt = document.getElementById('sog-txt');
-            if (sogDot) sogDot.style.background = '#ef4444';
-            if (sogTxt) sogTxt.textContent = 'ไม่พบไฟล์ UAV.sog';
-        });
-
-        app.assets.load(sogAsset);
-
-        // --- 4. Synchronize PlayCanvas Camera with MapLibre GL ---
-        function syncCamera() {
-            if (!cameraEntity || !map) return;
-
-            const center = map.getCenter();
-            const pitch = map.getPitch();
-            const bearing = map.getBearing();
-            const zoom = map.getZoom();
-
-            // Calculate ground resolution in meters per pixel
-            const mpp = (156543.03392 * Math.cos(SC09_LAT * Math.PI / 180)) / Math.pow(2, zoom);
-            
-            // MapLibre's camera distance to map center in pixels & meters
-            const fovRad = (map.transform?.fov || 0.6435011);
-            const cameraToCenterPixels = (window.innerHeight / 2) / Math.tan(fovRad / 2);
-            const distMeters = cameraToCenterPixels * mpp;
-
-            // Offset between current map center and SC.09
-            const dx = (center.lng - SC09_LNG) * METERS_PER_DEG_LNG;
-            const dy = (center.lat - SC09_LAT) * METERS_PER_DEG_LAT;
-
-            // Spherical coordinate transform
-            const pitchRad = pitch * pc.math.DEG_TO_RAD;
-            const bearingRad = -bearing * pc.math.DEG_TO_RAD;
-
-            const sinPitch = Math.sin(pitchRad);
-            const cosPitch = Math.cos(pitchRad);
-            const sinYaw = Math.sin(bearingRad);
-            const cosYaw = Math.cos(bearingRad);
-
-            // PlayCanvas coordinates: X = East, Y = Up, Z = South
-            const camX = -dx + distMeters * sinPitch * sinYaw;
-            const camY = distMeters * cosPitch;
-            const camZ = dy + distMeters * sinPitch * cosYaw;
-
-            cameraEntity.setPosition(camX, camY, camZ);
-            cameraEntity.lookAt(-dx, 0, dy);
-
-            // Match MapLibre FOV
-            cameraEntity.camera.fov = fovRad * pc.math.RAD_TO_DEG;
-        }
-
-        // Sync on MapLibre movements & animation loop
-        map.on('render', syncCamera);
-        map.on('move', syncCamera);
-        app.on('update', syncCamera);
-
-        // --- 5. Navigation Actions ---
+        // --- 2. Navigation Actions ---
         let isTransitioning = false;
 
         function moveToFloor01() {
@@ -806,68 +506,6 @@
                 essential: true
             });
         }
-
-        // --- 6. Calibration Controls ---
-        function toggleCalibrator() {
-            const el = document.getElementById('calibrator-drawer');
-            el.classList.toggle('open');
-        }
-
-        function saveCalibration() {
-            localStorage.setItem('kku_sog_scale', calibration.scale);
-            localStorage.setItem('kku_sog_yaw', calibration.yaw);
-            localStorage.setItem('kku_sog_height', calibration.height);
-            localStorage.setItem('kku_sog_posx', calibration.posX);
-            localStorage.setItem('kku_sog_posz', calibration.posZ);
-        }
-
-        document.getElementById('slider-scale').addEventListener('input', (e) => {
-            calibration.scale = parseFloat(e.target.value);
-            updateCalibrationUI();
-            saveCalibration();
-        });
-
-        document.getElementById('slider-yaw').addEventListener('input', (e) => {
-            calibration.yaw = parseFloat(e.target.value);
-            updateCalibrationUI();
-            saveCalibration();
-        });
-
-        document.getElementById('slider-height').addEventListener('input', (e) => {
-            calibration.height = parseFloat(e.target.value);
-            updateCalibrationUI();
-            saveCalibration();
-        });
-
-        document.getElementById('slider-pos-x').addEventListener('input', (e) => {
-            calibration.posX = parseFloat(e.target.value);
-            updateCalibrationUI();
-            saveCalibration();
-        });
-
-        document.getElementById('slider-pos-z').addEventListener('input', (e) => {
-            calibration.posZ = parseFloat(e.target.value);
-            updateCalibrationUI();
-            saveCalibration();
-        });
-
-        function rotateYaw90() {
-            calibration.yaw = (calibration.yaw + 90) % 360;
-            updateCalibrationUI();
-            saveCalibration();
-        }
-
-        function resetCalibration() {
-            calibration.scale = 1.0;
-            calibration.yaw = 0;
-            calibration.height = 0;
-            calibration.posX = 0;
-            calibration.posZ = 0;
-            updateCalibrationUI();
-            saveCalibration();
-        }
-
-        updateCalibrationUI();
     </script>
 </body>
 </html>

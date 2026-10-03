@@ -45,7 +45,7 @@ FpsWalker.prototype.initialize = function () {
     // Spawn point at elevator (Floor 01)
     this.initialPos = new pc.Vec3(7.81, 3.34, -0.55);
     this.initialRot = new pc.Vec3(0.0, 180.0, 0.0);
-    this.elevatorPos = new pc.Vec2(-7.70, -0.40);
+    this.elevatorPos = new pc.Vec2(10.533, -2.68);
     this._spawnLock = 15;
     this.entity.setPosition(this.initialPos);
     this.entity.setEulerAngles(this.initialRot);
@@ -226,11 +226,11 @@ FpsWalker.prototype.initialize = function () {
         },
         {
             id: "hs_1790938266824",
-            name: "ลิฟต์ชั้น1",
+            name: "ลิฟต์ชั้น 1",
             hint: "กด [E] หรือคลิกเพื่อเลือกชั้น",
             icon: "🛗",
             url: "#elevator",
-            prox: 3,
+            prox: 3.5,
             worldPos: new pc.Vec3(10.533, 3.34, -2.68),
             pos: { x: 10.533, y: 3.34, z: -2.68 },
             action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
@@ -408,8 +408,14 @@ FpsWalker.prototype.initialize = function () {
             var parsed = JSON.parse(savedHs);
             if (Array.isArray(parsed)) {
                 parsed.forEach(function (item) {
+                    if (item && (item.id === 'hs_1790938266824' || (item.name && item.name.indexOf('ลิฟต์') !== -1))) {
+                        item.pos = { x: 10.533, y: 3.34, z: -2.68 };
+                        item.worldPos = new pc.Vec3(10.533, 3.34, -2.68);
+                        item.name = 'ลิฟต์ชั้น 1';
+                    }
                     window._hotspotEditorRegister(item);
                 });
+                try { localStorage.setItem('floor01_hotspots_v1', JSON.stringify(parsed)); } catch (e) {}
             }
         }
     } catch (e) {}
@@ -539,19 +545,12 @@ FpsWalker.prototype.update = function (dt) {
             }
         }
 
-        // Elevator Prompt Banner
-        var elevatorPrompt = document.getElementById('elevator-prompt');
-        if (elevatorPrompt) {
-            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;
-            var elevZ = this.elevatorPos ? this.elevatorPos.y : -0.40;
-            var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
-            if (distToElev < 3.5 || pos.x <= -6.0) {
-                if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';
-                if (app.keyboard.wasPressed(pc.KEY_E)) {
-                    if (window.showElevatorModal) window.showElevatorModal();
-                }
-            } else {
-                if (elevatorPrompt.style.display === 'flex') elevatorPrompt.style.display = 'none';
+        var elevX = this.elevatorPos ? this.elevatorPos.x : 10.533;
+        var elevZ = this.elevatorPos ? this.elevatorPos.y : -2.68;
+        var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
+        if (distToElev < 3.5) {
+            if (app.keyboard.wasPressed(pc.KEY_E)) {
+                if (window.showElevatorModal) window.showElevatorModal();
             }
         }
     } else {
