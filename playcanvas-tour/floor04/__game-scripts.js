@@ -1,6 +1,6 @@
 // Floor 04 FPS Walker - Full parity with Floor 01
 var FpsWalker = pc.createScript("fpsWalker");
-FpsWalker.attributes.add("speed",     { type: "number", default: 4.5, title: "Movement Speed" });
+FpsWalker.attributes.add("speed",     { type: "number", default: 5.8, title: "Movement Speed" });
 FpsWalker.attributes.add("lookSpeed", { type: "number", default: 0.22, title: "Mouse Look Speed" });
 FpsWalker.attributes.add("jumpForce", { type: "number", default: 4.5, title: "Jump Force" });
 
@@ -50,7 +50,7 @@ FpsWalker.prototype.initialize = function () {
     // Spawn point at elevator (Floor 04) — X,Y,Z ผ่านการทดสอบ in-game
     this.initialPos = new pc.Vec3(0.08, 3.15, 24.32);
     this.initialRot = this.entity.getEulerAngles().clone();
-    this.elevatorPos = new pc.Vec2(0.08, 24.32);
+    this.elevatorPos = new pc.Vec2(2.823, 24.654);
     this._spawnLock = 15;
     this.entity.setPosition(this.initialPos);
     if (this.entity.rigidbody) {
@@ -153,26 +153,15 @@ FpsWalker.prototype.initialize = function () {
     });
     var defaultHotspots = [
         {
-            id: "hs_elevator_floor04",
-            name: "ลิฟต์ชั้น 4",
+            id: "hs_1790938323260",
+            name: "ลิฟต์ชั้น4",
             hint: "กด [E] หรือคลิกเพื่อเลือกชั้น",
             icon: "🛗",
             url: "#elevator",
-            prox: 5,
-            worldPos: new pc.Vec3(0.08, 3.15, 24.32),
-            pos: { x: 0.08, y: 3.15, z: 24.32 },
-            action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
-        },
-        {
-            id: "hs_1791026569984",
-            name: "ห้อง9428",
-            hint: "คลิกเพื่อเข้า",
-            icon: "🚪",
-            url: "#",
             prox: 3,
-            worldPos: new pc.Vec3(1.679, 3.15, 21.867),
-            pos: { x: 1.679, y: 3.15, z: 21.867 },
-            
+            worldPos: new pc.Vec3(2.823, 3.15, 24.654),
+            pos: { x: 2.823, y: 3.15, z: 24.654 },
+            action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
         }
     ];
     this.hotspots = defaultHotspots.slice();
@@ -259,6 +248,9 @@ FpsWalker.prototype.initialize = function () {
         var isCorrupted = !rawIcon || rawIcon.indexOf('') !== -1 || rawIcon.indexOf('๐') !== -1 || rawIcon.length > 8;
         var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (isCorrupted ? '📍' : rawIcon);
 
+        var legacyElev = document.getElementById('hs_elevator_floor04');
+        if (legacyElev) legacyElev.remove();
+
         var el = document.getElementById(hs.id);
         if (!el) {
             el = document.createElement('div');
@@ -303,6 +295,7 @@ FpsWalker.prototype.initialize = function () {
     }
 
     window._hotspotEditorRegister = function (data) {
+        if (!data || data.id === 'hs_elevator_floor04' || data.name === 'ลิฟต์ชั้น 4') return;
         var existing = self.hotspots.find(function(h) { return h.id === data.id; });
         if (existing) return;
 
@@ -398,7 +391,7 @@ FpsWalker.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     if (isSprinting) targetSpeed *= 1.7; // ~9.8 m/s sprint
     if (input.lengthSq() > 0) input.normalize().scale(targetSpeed);
     var accelFactor = Math.min(1, dtSec * 10);

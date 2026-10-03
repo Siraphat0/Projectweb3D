@@ -1,10 +1,10 @@
-﻿// Room 9422 FPS Walker - Full parity with Floor 01/02/03/04/05 & 9127
+// Room 9422 FPS Walker - Full parity with Floor 01/02/03/04/05 & 9127
 // Provides smooth mouse look (drag + pointer lock), natural WASD locomotion,
 // head bobbing, footsteps audio, and doorway portal back to Floor 04.
 
 var FpsWalker = pc.createScript("fpsWalker");
 
-FpsWalker.attributes.add("speed",     { type: "number", default: 4.5,  title: "Movement Speed" });
+FpsWalker.attributes.add("speed",     { type: "number", default: 5.8,  title: "Movement Speed" });
 FpsWalker.attributes.add("lookSpeed", { type: "number", default: 0.22, title: "Mouse Look Speed" });
 FpsWalker.attributes.add("jumpForce", { type: "number", default: 4.5,  title: "Jump Force" });
 
@@ -219,10 +219,10 @@ FpsWalker.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
 
-    var targetSpeed = this.speed || 4.5;
+    var targetSpeed = this.speed || 5.8;
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
     if (isSprinting) {
-        targetSpeed *= 1.65;
+        targetSpeed *= 1.7;
     }
 
     if (input.lengthSq() > 0) {

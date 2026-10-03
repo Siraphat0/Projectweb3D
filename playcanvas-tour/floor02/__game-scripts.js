@@ -40,7 +40,7 @@ FpsWalker.prototype.initialize = function () {
     // Spawn point at elevator (Floor 02) — X,Y,Z ผ่านการทดสอบ in-game
     this.initialPos = new pc.Vec3(-7.70, 0.35, -0.40);
     this.initialRot = this.entity.getEulerAngles().clone();
-    this.elevatorPos = new pc.Vec2(-7.70, -0.40);
+    this.elevatorPos = new pc.Vec2(-7.844, 2.04);
     this._spawnLock = 15;
 
     this.entity.setPosition(this.initialPos);
@@ -194,14 +194,14 @@ FpsWalker.prototype.initialize = function () {
     // ─── Hotspot System & Admin Tool Integration — Floor 02 ───
     var defaultHotspots = [
         {
-            id: "hs_elevator_floor02",
-            name: "ลิฟต์ชั้น 2",
+            id: "hs_1790938242545",
+            name: "ลิฟต์ชั้น2",
             hint: "กด [E] หรือคลิกเพื่อเลือกชั้น",
             icon: "🛗",
             url: "#elevator",
-            prox: 5,
-            worldPos: new pc.Vec3(-7.7, 0.35, -0.4),
-            pos: { x: -7.7, y: 0.35, z: -0.4 },
+            prox: 3,
+            worldPos: new pc.Vec3(-7.844, 0.55, 2.04),
+            pos: { x: -7.844, y: 0.55, z: 2.04 },
             action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
         }
     ];
@@ -283,6 +283,9 @@ FpsWalker.prototype.initialize = function () {
         var isCorrupted = !rawIcon || rawIcon.indexOf('') !== -1 || rawIcon.indexOf('๐') !== -1 || rawIcon.length > 8;
         var iconHtml = isElevator ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 10l-2-2 2-2M16 14l2 2-2 2"/></svg>' : (isCorrupted ? '📍' : rawIcon);
 
+        var legacyElev = document.getElementById('hs_elevator_floor02');
+        if (legacyElev) legacyElev.remove();
+
         var el = document.getElementById(hs.id);
         if (!el) {
             el = document.createElement('div');
@@ -327,6 +330,7 @@ FpsWalker.prototype.initialize = function () {
     }
 
     window._hotspotEditorRegister = function (data) {
+        if (!data || data.id === 'hs_elevator_floor02' || data.name === 'ลิฟต์ชั้น 2') return;
         var existing = self.hotspots.find(function(h) { return h.id === data.id; });
         if (existing) return;
 
@@ -434,7 +438,7 @@ FpsWalker.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
 
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
     if (isSprinting) {
         targetSpeed *= 1.7; // ~9.8m/s
@@ -468,8 +472,8 @@ FpsWalker.prototype.update = function (dt) {
         // ─── 4. Elevator Prompt Check ───
         var elevatorPrompt = document.getElementById('elevator-prompt');
         if (elevatorPrompt) {
-            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.70;
-            var elevZ = this.elevatorPos ? this.elevatorPos.y : -0.40;
+            var elevX = this.elevatorPos ? this.elevatorPos.x : -7.844;
+            var elevZ = this.elevatorPos ? this.elevatorPos.y : 2.04;
             var distToElev = Math.hypot(pos.x - elevX, pos.z - elevZ);
             if (distToElev < 3.5 || pos.x <= -6.0) {
                 if (elevatorPrompt.style.display !== 'flex') elevatorPrompt.style.display = 'flex';

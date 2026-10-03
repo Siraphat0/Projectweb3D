@@ -1,6 +1,6 @@
 // Floor 03 FPS Walker - Full parity with Floor 01
 var FpsWalker = pc.createScript("fpsWalker");
-FpsWalker.attributes.add("speed",     { type: "number", default: 4.5, title: "Movement Speed" });
+FpsWalker.attributes.add("speed",     { type: "number", default: 5.8, title: "Movement Speed" });
 FpsWalker.attributes.add("lookSpeed", { type: "number", default: 0.22, title: "Mouse Look Speed" });
 FpsWalker.attributes.add("jumpForce", { type: "number", default: 4.5, title: "Jump Force" });
 
@@ -373,7 +373,7 @@ FpsWalker.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     if (isSprinting) targetSpeed *= 1.7; // ~9.8 m/s sprint
     if (input.lengthSq() > 0) input.normalize().scale(targetSpeed);
     var accelFactor = Math.min(1, dtSec * 10);

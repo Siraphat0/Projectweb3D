@@ -112,6 +112,13 @@
                 </button>
                                 <div class="hud-dropdown-menu">
                     <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
+                    <a href="../home/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🏠</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">หน้าโฮม</span>
+                            <span class="hud-menu-sub">หน้าแรกของระบบ Virtual Tour</span>
+                        </div>
+                    </a>
                     <a href="../" class="hud-menu-item">
                         <span class="hud-menu-icon">🏛️</span>
                         <div class="hud-menu-content">
@@ -270,12 +277,19 @@
     (function() {
         var editorOpen = false, pendingPos = null, hotspots = [];
         var STORAGE_KEY = 'floor04_hotspots_v1';
-        var DEFAULT_HOTSPOTS = [{"id": "hs_elevator_floor04", "name": "ลิฟต์ชั้น 4", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 5, "pos": {"x": 0.08, "y": 3.15, "z": 24.32}}, {"id": "hs_1791026569984", "name": "ห้อง9428", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": {"x": 1.679, "y": 3.15, "z": 21.867}}];
+        var DEFAULT_HOTSPOTS = [{"id": "hs_1790938323260", "name": "ลิฟต์ชั้น4", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": 2.823, "y": 3.15, "z": 24.654}}];
 
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 hotspots = JSON.parse(saved);
+                var prevLen = hotspots.length;
+                hotspots = hotspots.filter(function (h) {
+                    return h && h.id !== 'hs_elevator_floor04' && h.name !== 'ลิฟต์ชั้น 4';
+                });
+                if (hotspots.length !== prevLen) {
+                    saveToStorage();
+                }
             }
             if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

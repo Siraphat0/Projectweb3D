@@ -113,6 +113,13 @@
                 </button>
                                 <div class="hud-dropdown-menu">
                     <div class="hud-dropdown-header">เลือกชั้น / จุดสำรวจ</div>
+                    <a href="../home/" class="hud-menu-item">
+                        <span class="hud-menu-icon">🏠</span>
+                        <div class="hud-menu-content">
+                            <span class="hud-menu-title">หน้าโฮม</span>
+                            <span class="hud-menu-sub">หน้าแรกของระบบ Virtual Tour</span>
+                        </div>
+                    </a>
                     <a href="../" class="hud-menu-item">
                         <span class="hud-menu-icon">🏛️</span>
                         <div class="hud-menu-content">
@@ -317,12 +324,19 @@
         var pendingPos = null;
         var hotspots = [];
         var STORAGE_KEY = 'floor02_hotspots_v1';
-        var DEFAULT_HOTSPOTS = [{"id": "hs_elevator_floor02", "name": "ลิฟต์ชั้น 2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 5, "pos": {"x": -7.7, "y": 0.35, "z": -0.4}}];
+        var DEFAULT_HOTSPOTS = [{"id": "hs_1790938242545", "name": "ลิฟต์ชั้น2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": {"x": -7.844, "y": 0.55, "z": 2.04}}];
 
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 hotspots = JSON.parse(saved);
+                var prevLen = hotspots.length;
+                hotspots = hotspots.filter(function (h) {
+                    return h && h.id !== 'hs_elevator_floor02' && h.name !== 'ลิฟต์ชั้น 2';
+                });
+                if (hotspots.length !== prevLen) {
+                    saveToStorage();
+                }
             }
             if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

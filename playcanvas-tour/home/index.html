@@ -257,6 +257,19 @@
       border-color: #fff;
     }
 
+    .btn-team {
+      background: rgba(249, 87, 56, 0.18);
+      border-color: rgba(249, 87, 56, 0.7);
+      color: #fff;
+    }
+
+    .btn-team:hover {
+      background: #f95738;
+      border-color: #f95738;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(249, 87, 56, 0.45);
+    }
+
     .btn-nav-solid {
       font-family: 'Prompt', sans-serif;
       font-size: 12px;
@@ -520,14 +533,16 @@
     .floor-btn-opt {
       display: flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
       gap: 10px;
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
       color: #334155;
-      padding: 12px 16px;
+      padding: 13px 16px;
       border-radius: 12px;
       text-decoration: none;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
       transition: all 0.2s ease;
     }
@@ -619,7 +634,8 @@
       </a>
 
       <div class="nav-actions">
-        <a href="../map/" class="btn-nav-outline"> แผนที่ดาวเทียม</a>
+        <a href="../map/" class="btn-nav-outline">แผนที่ดาวเทียม</a>
+        <a href="../team/" class="btn-nav-outline btn-team" id="btn-creators">คณะผู้จัดทำ</a>
       </div>
     </div>
 
@@ -664,44 +680,31 @@
   <div class="floor-modal" id="floorModal" onclick="closeFloorModal(event)">
     <div class="modal-box">
       <h3 class="modal-title">เลือกจุดเริ่มต้นเดินสำรวจ</h3>
-      <p class="modal-desc">เลือกโซนหรือชั้นในอาคารวิทยวิภาส (SC.09) ที่ต้องการเข้าชม</p>
+      <p class="modal-desc">เลือกโซนหรือชั้นในอาคารวิทยวิภาส ที่ต้องการเข้าชม</p>
 
       <div class="floor-options-grid">
         <a href="../" class="floor-btn-opt">
-          <span class="floor-icon">🏛️</span>
-          <span>ด้านหน้าอาคาร (ภายนอก)</span>
+          <span>ด้านหน้าอาคาร</span>
         </a>
         <a href="../inside/" class="floor-btn-opt">
-          <span class="floor-icon">🚪</span>
           <span>โถงต้อนรับ ชั้น 1</span>
         </a>
         <a href="../floor01/" class="floor-btn-opt">
-          <span class="floor-icon">🏢</span>
-          <span>ชั้น 1 (ด้านใน)</span>
-        </a>
-        <a href="../9127/" class="floor-btn-opt">
-          <span class="floor-icon">🚪</span>
-          <span>ห้อง 9127 (ห้องปฏิบัติการ)</span>
+          <span>ชั้น 1</span>
         </a>
         <a href="../floor02/" class="floor-btn-opt">
-          <span class="floor-icon">🛋️</span>
-          <span>ชั้น 2 (ห้องสมุด)</span>
+          <span>ชั้น 2</span>
         </a>
         <a href="../floor03/" class="floor-btn-opt">
-          <span class="floor-icon">🔬</span>
-          <span>ชั้น 3 (ห้องเรียน & ห้องปฏิบัติการ)</span>
+          <span>ชั้น 3</span>
         </a>
         <a href="../floor04/" class="floor-btn-opt">
-          <span class="floor-icon">📚</span>
-          <span>ชั้น 4 (ห้องเรียน)</span>
+          <span>ชั้น 4</span>
         </a>
-
         <a href="../floor05/" class="floor-btn-opt">
-          <span class="floor-icon">💻</span>
-          <span>ชั้น 5 (Co-Working)</span>
+          <span>ชั้น 5</span>
         </a>
-        <a href="../map/" class="floor-btn-opt" style="grid-column: 1 / -1;">
-          <span class="floor-icon">🗺️</span>
+        <a href="../map/" class="floor-btn-opt">
           <span>แผนที่อาคาร 3D และดาวเทียม</span>
         </a>
       </div>

@@ -1,6 +1,6 @@
 var FirstPersonController = pc.createScript("firstPersonController");
 
-FirstPersonController.attributes.add("speed", { type: "number", default: 4.5, title: "Speed" });
+FirstPersonController.attributes.add("speed", { type: "number", default: 5.8, title: "Speed" });
 FirstPersonController.attributes.add("jumpForce", { type: "number", default: 4, title: "Jump Force" });
 FirstPersonController.attributes.add("lookSpeed", { type: "number", default: 0.22, title: "Look Speed" });
 
@@ -490,7 +490,7 @@ FirstPersonController.prototype.update = function (dt) {
     if (app.keyboard.isPressed(pc.KEY_A) || app.keyboard.isPressed(pc.KEY_LEFT))  input.sub(right);
     if (app.keyboard.isPressed(pc.KEY_D) || app.keyboard.isPressed(pc.KEY_RIGHT)) input.add(right);
 
-    var targetSpeed = this.speed || 6.5;
+    var targetSpeed = this.speed || 5.8;
     var isSprinting = app.keyboard.isPressed(pc.KEY_SHIFT);
     if (isSprinting) {
         targetSpeed *= 1.7; // ~9.8m/s
@@ -500,7 +500,7 @@ FirstPersonController.prototype.update = function (dt) {
         input.normalize().scale(targetSpeed);
     }
 
-    var accelFactor = Math.min(1, dtSec * 9);
+    var accelFactor = Math.min(1, dtSec * 10);
     this.currentVelocity.lerp(this.currentVelocity, input, accelFactor);
 
     // ─── 3. Physics & Jump ───
