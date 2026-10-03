@@ -226,11 +226,68 @@ FpsWalker.prototype.initialize = function () {
             hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
             icon: '🛗',
             url: '#elevator',
-            worldPos: new pc.Vec3(0.0, 1.6, 0.0),
+            worldPos: new pc.Vec3(-2.96, 0.95, -0.98),
             prox: 5.0,
             action: function () {
                 if (window.showElevatorModal) window.showElevatorModal();
             }
+        },
+        {
+            id: 'hs_1790919302033',
+            name: 'ห้อง9524',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            worldPos: new pc.Vec3(7.59, 0.83, 1.509),
+            prox: 3.0
+        },
+        {
+            id: 'hs_1790919326005',
+            name: 'ห้อง9525',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            worldPos: new pc.Vec3(10.915, 0.834, 2.655),
+            prox: 3.0
+        },
+        {
+            id: 'hs_1790938341440',
+            name: 'ลิฟต์ชั้น5',
+            hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
+            icon: '🛗',
+            url: '#elevator',
+            worldPos: new pc.Vec3(-2.702, 0.9, -0.123),
+            prox: 3.0,
+            action: function () {
+                if (window.showElevatorModal) window.showElevatorModal();
+            }
+        },
+        {
+            id: 'hs_1790938385079',
+            name: 'ห้อง9516',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            worldPos: new pc.Vec3(-1.106, 0.9, -0.595),
+            prox: 3.0
+        },
+        {
+            id: 'hs_1790951011080',
+            name: 'ห้อง9527',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            worldPos: new pc.Vec3(-2.912, 0.899, -2.432),
+            prox: 3.0
+        },
+        {
+            id: 'hs_1790957840429',
+            name: 'บอท',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            worldPos: new pc.Vec3(13.819, 0.895, 2.914),
+            prox: 3.0
         }
     ];
 

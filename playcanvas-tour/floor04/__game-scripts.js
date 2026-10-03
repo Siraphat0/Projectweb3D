@@ -146,8 +146,17 @@ FpsWalker.prototype.initialize = function () {
             hint: 'กด [E] หรือคลิกเพื่อเลือกชั้น',
             icon: '🛗',
             url: '#elevator',
-            pos: { x: 0.0, y: 1.85, z: 0.0 },
+            pos: { x: 0.08, y: 2.80, z: 24.32 },
             prox: 5.0
+        },
+        {
+            id: 'hs_1791026569984',
+            name: 'ห้อง9428',
+            hint: 'คลิกเพื่อเข้า',
+            icon: '🚪',
+            url: '#',
+            pos: { x: 1.679, y: 3.15, z: 21.867 },
+            prox: 3.0
         }
     ];
 
