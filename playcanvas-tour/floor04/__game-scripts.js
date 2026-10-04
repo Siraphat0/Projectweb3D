@@ -161,7 +161,40 @@ FpsWalker.prototype.initialize = function () {
             prox: 3,
             worldPos: new pc.Vec3(2.823, 3.15, 24.654),
             pos: { x: 2.823, y: 3.15, z: 24.654 },
-            action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
+            action: function () { if (window.showElevatorModal) window.showElevatorModal(); }
+        },
+        {
+            id: "hs_1791026569984",
+            name: "ห้อง9428",
+            hint: "คลิกเพื่อเข้า",
+            icon: "🚪",
+            url: "#",
+            prox: 3,
+            worldPos: new pc.Vec3(1.679, 3.15, 21.867),
+            pos: { x: 1.679, y: 3.15, z: 21.867 },
+            action: function () { handleHotspotAction('#', 'ห้อง9428', null); }
+        },
+        {
+            id: "hs_1790938103607",
+            name: "ห้อง9422",
+            hint: "กด [E] หรือคลิกเพื่อเข้าห้อง",
+            icon: "🚪",
+            url: "../9422/",
+            prox: 3,
+            worldPos: new pc.Vec3(-5.478, 3.15, -1.505),
+            pos: { x: -5.478, y: 3.15, z: -1.505 },
+            action: function () { if (window.portalTo9422) window.portalTo9422(); else window.location.href = '../9422/'; }
+        },
+        {
+            id: "hs_1790919204488",
+            name: "ห้อง9421",
+            hint: "คลิกเพื่อเข้า",
+            icon: "🚪",
+            url: "#",
+            prox: 3,
+            worldPos: new pc.Vec3(2.975, 3.15, 21.735),
+            pos: { x: 2.975, y: 3.15, z: 21.735 },
+            action: function () { handleHotspotAction('#', 'ห้อง9421', null); }
         }
     ];
     this.hotspots = defaultHotspots.slice();

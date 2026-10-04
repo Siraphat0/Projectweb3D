@@ -275,7 +275,12 @@
         (function () {
             var editorOpen = false, pendingPos = null, hotspots = [];
             var STORAGE_KEY = 'floor04_hotspots_v1';
-            var DEFAULT_HOTSPOTS = [{ "id": "hs_1790938323260", "name": "ลิฟต์ชั้น4", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": 2.823, "y": 3.15, "z": 24.654 } }];
+            var DEFAULT_HOTSPOTS = [
+                { "id": "hs_1790938323260", "name": "ลิฟต์ชั้น4", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": 2.823, "y": 3.15, "z": 24.654 } },
+                { "id": "hs_1791026569984", "name": "ห้อง9428", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 1.679, "y": 3.15, "z": 21.867 } },
+                { "id": "hs_1790938103607", "name": "ห้อง9422", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9422/", "prox": 3, "pos": { "x": -5.478, "y": 3.15, "z": -1.505 } },
+                { "id": "hs_1790919204488", "name": "ห้อง9421", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 2.975, "y": 3.15, "z": 21.735 } }
+            ];
 
             try {
                 var saved = localStorage.getItem(STORAGE_KEY);
@@ -292,6 +297,17 @@
                 if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                     hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
                     saveToStorage();
+                } else {
+                    var added = false;
+                    DEFAULT_HOTSPOTS.forEach(function (def) {
+                        if (!hotspots.some(function (h) { return h.id === def.id; })) {
+                            hotspots.push(JSON.parse(JSON.stringify(def)));
+                            added = true;
+                        }
+                    });
+                    if (added) {
+                        saveToStorage();
+                    }
                 }
             } catch (e) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

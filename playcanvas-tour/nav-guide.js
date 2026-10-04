@@ -46,7 +46,8 @@
             'west':         { x: -1.00,  z: -0.40, edges: ['elev', 'coworking'] },
             'coworking':    { x: 2.50,   z: -0.40, edges: ['west', 'east'] },
             'east':         { x: 7.50,   z: -0.40, edges: ['coworking', 'lounge'] },
-            'lounge':       { x: 12.50,  z: -0.40, edges: ['east'] }
+            'lounge':       { x: 12.50,  z: -0.40, edges: ['east', 'door_9227'] },
+            'door_9227':    { x: 13.51,  z: -0.05, edges: ['lounge'] }
         },
         floor03: {
             'elev':         { x: -1.27,  z: 6.17,  edges: ['lecture_hall', 'mid'] },
@@ -58,11 +59,15 @@
         },
         floor04: {
             'elev':         { x: 2.82,   z: 24.65, edges: ['junction'] },
-            'junction':     { x: 0.08,   z: 24.32, edges: ['elev', 'dept_hall', 'mid'] },
+            'junction':     { x: 0.08,   z: 24.32, edges: ['elev', 'dept_hall', 'mid', 'door_9428', 'door_9421'] },
+            'door_9428':    { x: 1.68,   z: 21.87, edges: ['junction'] },
+            'door_9421':    { x: 2.98,   z: 21.74, edges: ['junction'] },
             'dept_hall':    { x: 8.00,   z: 24.32, edges: ['junction', 'dept_office'] },
             'dept_office':  { x: 16.50,  z: 24.32, edges: ['dept_hall'] },
             'mid':          { x: 0.08,   z: 15.00, edges: ['junction', 'class_9401'] },
-            'class_9401':   { x: 0.08,   z: 5.00,  edges: ['mid'] }
+            'class_9401':   { x: 0.08,   z: 5.00,  edges: ['mid', 'corner_9422'] },
+            'corner_9422':  { x: -5.48,  z: 5.00,  edges: ['class_9401', 'door_9422'] },
+            'door_9422':    { x: -5.48,  z: -1.51, edges: ['corner_9422'] }
         },
         floor05: {
             'elev':         { x: -2.96,  z: -0.98, edges: ['meet_hall', 'mid'] },

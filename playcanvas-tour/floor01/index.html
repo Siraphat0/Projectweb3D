@@ -327,6 +327,17 @@
             if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
                 saveToStorage();
+            } else {
+                var added = false;
+                DEFAULT_HOTSPOTS.forEach(function (def) {
+                    if (!hotspots.some(function (h) { return h.id === def.id; })) {
+                        hotspots.push(JSON.parse(JSON.stringify(def)));
+                        added = true;
+                    }
+                });
+                if (added) {
+                    saveToStorage();
+                }
             }
         } catch (e) {
             hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

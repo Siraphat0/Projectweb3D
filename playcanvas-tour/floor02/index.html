@@ -314,7 +314,11 @@
             var pendingPos = null;
             var hotspots = [];
             var STORAGE_KEY = 'floor02_hotspots_v1';
-            var DEFAULT_HOTSPOTS = [{ "id": "hs_1790938242545", "name": "ลิฟต์ชั้น2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": -7.844, "y": 0.55, "z": 2.04 } }];
+            var DEFAULT_HOTSPOTS = [
+                { "id": "hs_1790938242545", "name": "ลิฟต์ชั้น2", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": -7.844, "y": 0.55, "z": 2.04 } },
+                { "id": "hs_1790919095395", "name": "ห้อง9227", "hint": "กด [E] หรือคลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 13.514, "y": 0.55, "z": -0.046 } },
+                { "id": "hs_1791041050222", "name": "จองห้อง (Room Booking)", "hint": "คลิกเพื่อเปิดระบบจองห้อง", "icon": "📍", "url": "https://appcs.kku.ac.th/room/usermanual.php?day=03&month=10&year=2026", "prox": 3, "pos": { "x": 2.50, "y": 0.55, "z": -0.40 } }
+            ];
 
             try {
                 var saved = localStorage.getItem(STORAGE_KEY);
@@ -331,6 +335,17 @@
                 if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                     hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
                     saveToStorage();
+                } else {
+                    var added = false;
+                    DEFAULT_HOTSPOTS.forEach(function (def) {
+                        if (!hotspots.some(function (h) { return h.id === def.id; })) {
+                            hotspots.push(JSON.parse(JSON.stringify(def)));
+                            added = true;
+                        }
+                    });
+                    if (added) {
+                        saveToStorage();
+                    }
                 }
             } catch (e) {
                 hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

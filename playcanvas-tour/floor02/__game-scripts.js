@@ -202,7 +202,29 @@ FpsWalker.prototype.initialize = function () {
             prox: 3,
             worldPos: new pc.Vec3(-7.844, 0.55, 2.04),
             pos: { x: -7.844, y: 0.55, z: 2.04 },
-            action: function () { if (window.showElevatorModal) window.showElevatorModal(); },
+            action: function () { if (window.showElevatorModal) window.showElevatorModal(); }
+        },
+        {
+            id: "hs_1790919095395",
+            name: "ห้อง9227",
+            hint: "กด [E] หรือคลิกเพื่อเข้า",
+            icon: "🚪",
+            url: "#",
+            prox: 3,
+            worldPos: new pc.Vec3(13.514, 0.55, -0.046),
+            pos: { x: 13.514, y: 0.55, z: -0.046 },
+            action: function () { handleHotspotAction('#', 'ห้อง9227', null); }
+        },
+        {
+            id: "hs_1791041050222",
+            name: "จองห้อง (Room Booking)",
+            hint: "คลิกเพื่อเปิดระบบจองห้อง",
+            icon: "📍",
+            url: "https://appcs.kku.ac.th/room/usermanual.php?day=03&month=10&year=2026",
+            prox: 3,
+            worldPos: new pc.Vec3(2.50, 0.55, -0.40),
+            pos: { x: 2.50, y: 0.55, z: -0.40 },
+            action: function () { window.open('https://appcs.kku.ac.th/room/usermanual.php?day=03&month=10&year=2026', '_blank'); }
         }
     ];
     this.hotspots = defaultHotspots.slice();
