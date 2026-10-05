@@ -239,13 +239,13 @@ FpsWalker.prototype.initialize = function () {
         {
             id: "hs_1790919326005",
             name: "ห้อง9525",
-            hint: "คลิกเพื่อเข้า",
+            hint: "กด [E] หรือคลิกเพื่อเข้าห้อง",
             icon: "🚪",
-            url: "#",
+            url: "../9525/",
             prox: 3,
             worldPos: new pc.Vec3(10.915, 0.834, 2.655),
             pos: { x: 10.915, y: 0.834, z: 2.655 },
-            
+            action: function () { if (window.portalTo9525) window.portalTo9525(); else window.location.href = '../9525/'; },
         },
         {
             id: "hs_1790938341440",
@@ -321,6 +321,12 @@ FpsWalker.prototype.initialize = function () {
         if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
             if (window.portalTo9524) { window.portalTo9524(); return; }
             else { window.location.href = '../9524/'; return; }
+        }
+
+        // Room 9525 (ห้อง 9525 ชั้น 5)
+        if (url.indexOf('9525') !== -1 || name.indexOf('9525') !== -1) {
+            if (window.portalTo9525) { window.portalTo9525(); return; }
+            else { window.location.href = '../9525/'; return; }
         }
 
         // Room 9421 / 9422

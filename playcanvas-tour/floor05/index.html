@@ -277,12 +277,31 @@
         (function () {
             var editorOpen = false, pendingPos = null, hotspots = [];
             var STORAGE_KEY = 'floor05_hotspots_v1';
-            var DEFAULT_HOTSPOTS = [{ "id": "hs_1790919302033", "name": "ห้อง9524", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "../9524/", "prox": 3, "pos": { "x": 7.59, "y": 0.83, "z": 1.509 } }, { "id": "hs_1790919326005", "name": "ห้อง9525", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 10.915, "y": 0.834, "z": 2.655 } }, { "id": "hs_1790938341440", "name": "ลิฟต์ชั้น5", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": -2.702, "y": 0.9, "z": -0.123 } }, { "id": "hs_1790938385079", "name": "ห้อง9516", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": -1.106, "y": 0.9, "z": -0.595 } }, { "id": "hs_1790951011080", "name": "ห้อง9527", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": -2.912, "y": 0.899, "z": -2.432 } }, { "id": "hs_1790957840429", "name": "บอท", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 13.819, "y": 0.895, "z": 2.914 } }];
+            var DEFAULT_HOTSPOTS = [
+                { "id": "hs_1790919302033", "name": "ห้อง9524", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "../9524/", "prox": 3, "pos": { "x": 7.59, "y": 0.83, "z": 1.509 } },
+                { "id": "hs_1790919326005", "name": "ห้อง9525", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9525/", "prox": 3, "pos": { "x": 10.915, "y": 0.834, "z": 2.655 } },
+                { "id": "hs_1790938341440", "name": "ลิฟต์ชั้น5", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": -2.702, "y": 0.9, "z": -0.123 } },
+                { "id": "hs_1790938385079", "name": "ห้อง9516", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": -1.106, "y": 0.9, "z": -0.595 } },
+                { "id": "hs_1790951011080", "name": "ห้อง9527", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": -2.912, "y": 0.899, "z": -2.432 } },
+                { "id": "hs_1790957840429", "name": "บอท", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 13.819, "y": 0.895, "z": 2.914 } }
+            ];
 
             try {
                 var saved = localStorage.getItem(STORAGE_KEY);
                 if (saved) {
                     hotspots = JSON.parse(saved);
+                    // Update any legacy empty URL for 9525
+                    var updatedUrl = false;
+                    hotspots.forEach(function (h) {
+                        if (h && (h.id === 'hs_1790919326005' || h.name === 'ห้อง9525')) {
+                            if (h.url === '#' || !h.url) {
+                                h.url = '../9525/';
+                                h.hint = 'กด [E] หรือคลิกเพื่อเข้าห้อง';
+                                updatedUrl = true;
+                            }
+                        }
+                    });
+                    if (updatedUrl) saveToStorage();
                 }
                 if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
                     hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));

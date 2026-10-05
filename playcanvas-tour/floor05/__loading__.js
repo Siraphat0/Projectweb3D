@@ -28,6 +28,14 @@ pc.script.createLoadingScreen((app) => {
         }, 500);
     };
 
+    // Portal to Room 9525
+    window.portalTo9525 = function () {
+        if (portalFade) portalFade.classList.add('active');
+        setTimeout(() => {
+            window.location.href = '../9525/';
+        }, 500);
+    };
+
     // Portal to Room 9422
     window.portalTo9422 = function () {
         if (portalFade) portalFade.classList.add('active');
