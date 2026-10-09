@@ -11,12 +11,63 @@ pc.script.createLoadingScreen((app) => {
     const btnDoorOutside  = document.getElementById('btn-door-outside');
     const btnDoorFloor01  = document.getElementById('btn-door-floor01');
     const portalFade      = document.getElementById('portal-fade');
+    const elevatorModal   = document.getElementById('elevator-modal');
+
+    // Elevator Modal Controller
+    window.showElevatorModal = function () {
+        if (document.exitPointerLock) {
+            try { document.exitPointerLock(); } catch (e) {}
+        }
+        if (elevatorModal) elevatorModal.style.display = 'flex';
+    };
+
+    window.closeElevatorModal = function () {
+        if (elevatorModal) elevatorModal.style.display = 'none';
+    };
+
+    if (elevatorModal) {
+        elevatorModal.addEventListener('click', (e) => {
+            if (e.target === elevatorModal) {
+                window.closeElevatorModal();
+            }
+        });
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            window.closeElevatorModal();
+        }
+    });
 
     // Portal to Floor 01 (ชั้น 1 ด้านใน)
     window.portalToFloor01 = function () {
         if (portalFade) portalFade.classList.add('active');
         setTimeout(() => {
             window.location.href = '../floor01/';
+        }, 500);
+    };
+
+    // Portal to Floor 02 (ชั้น 2)
+    window.portalToFloor02 = function () {
+        if (portalFade) portalFade.classList.add('active');
+        setTimeout(() => {
+            window.location.href = '../floor02/';
+        }, 500);
+    };
+
+    // Portal to Floor 03 (ชั้น 3)
+    window.portalToFloor03 = function () {
+        if (portalFade) portalFade.classList.add('active');
+        setTimeout(() => {
+            window.location.href = '../floor03/';
+        }, 500);
+    };
+
+    // Portal to Floor 04 (ชั้น 4)
+    window.portalToFloor04 = function () {
+        if (portalFade) portalFade.classList.add('active');
+        setTimeout(() => {
+            window.location.href = '../floor04/';
         }, 500);
     };
 

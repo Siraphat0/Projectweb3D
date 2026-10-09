@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <style></style>
     <link rel="manifest" href="manifest.json">
     
     <script src="playcanvas-stable.min.js"></script>
@@ -173,6 +172,40 @@
         <div id="door-floor01-prompt" onclick="if(window.portalToFloor01) window.portalToFloor01();" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.96); border: 2px solid #f97316; box-shadow: 0 0 24px rgba(249, 115, 22, 0.55); backdrop-filter: blur(16px); color: #ea580c; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 700; display: none; align-items: center; gap: 10px; z-index: 200; cursor: pointer; animation: pulse-door 1.8s infinite ease-in-out;">
             <span>🚪</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อเข้าสู่ Floor 01 (ชั้น 1 ด้านใน)</span>
+        </div>
+
+        <!-- Elevator Floor Selector Modal -->
+        <div id="elevator-modal" class="elevator-modal-overlay">
+            <div class="elevator-modal-card">
+                <div class="elevator-modal-icon">🛗</div>
+                <h3 class="elevator-modal-title">ลิฟต์อาคาร SC.09</h3>
+                <p class="elevator-modal-sub">คุณอยู่ที่: โถงกลางชั้น 1 (Main Lobby)</p>
+                <div class="elevator-modal-list">
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor05 && window.portalToFloor05();">
+                        🔺 ขึ้นชั้น 5 (Floor 05)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor04 && window.portalToFloor04();">
+                        🔺 ขึ้นชั้น 4 (Floor 04)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor03 && window.portalToFloor03();">
+                        🔺 ขึ้นชั้น 3 (Floor 03)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor02 && window.portalToFloor02();">
+                        🔺 ขึ้นชั้น 2 (Floor 02)
+                    </button>
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor01 && window.portalToFloor01();">
+                        🚪 เข้าชั้น 1 ด้านใน (Floor 01)
+                    </button>
+                </div>
+                <button class="elevator-modal-close"
+                    onclick="window.closeElevatorModal ? window.closeElevatorModal() : (document.getElementById('elevator-modal').style.display='none');">✕
+                    ปิดหน้าต่าง</button>
+            </div>
         </div>
 
 

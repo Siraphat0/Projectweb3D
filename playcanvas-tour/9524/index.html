@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <style></style>
     <link rel="manifest" href="manifest.json">
     
     <script src="playcanvas-stable.min.js"></script>
@@ -142,11 +141,12 @@
             </div>
 
             <!-- Utility Buttons -->
-            <a href="../floor05/" class="hud-btn" title="กลับสู่ทางเดินชั้น 5">
+            <a href="../floor05/?from=9524" class="hud-btn" title="กลับสู่ทางเดินชั้น 5">
                 <span>🔙</span>
                 <span>ออกสู่ชั้น 5</span>
             </a>
             <a href="../map/" class="hud-btn" title="เปิดแผนที่อาคาร 3D">
+                <span>🗺️</span>
                 <span>แผนที่ 3D</span>
             </a>
             <button class="hud-btn" id="btn-reset-cam" title="รีเซ็ตตำแหน่งเริ่มต้น">
@@ -164,7 +164,7 @@
         </div>
 
         <!-- Door Exit Prompt Banner -->
-        <div id="door-prompt" onclick="if(window.portalToFloor05) window.portalToFloor05(); else window.location.href='../floor05/';" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #ffffff; border: 2px solid #f95738; box-shadow: 0 10px 32px rgba(249, 87, 56, 0.35); color: #1e293b; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 700; display: none; align-items: center; gap: 10px; z-index: 200; cursor: pointer;">
+        <div id="door-prompt" onclick="if(window.portalToFloor05) window.portalToFloor05(); else window.location.href='../floor05/?from=9524';" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #ffffff; border: 2px solid #f95738; box-shadow: 0 10px 32px rgba(249, 87, 56, 0.35); color: #1e293b; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 700; display: none; align-items: center; gap: 10px; z-index: 200; cursor: pointer;">
             <span>🚪</span>
             <span>กด [E] หรือคลิกตรงนี้เพื่อกลับสู่ทางเดินชั้น 5 (Floor 05)</span>
         </div>

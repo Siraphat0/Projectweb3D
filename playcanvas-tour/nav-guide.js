@@ -22,9 +22,9 @@
     var navTime = 0;
     var isInitialized = false;
 
-    var MAX_ARROWS = 45;
-    var SPACING = 1.55; // meters between arrows
-    var TARGET_RADIUS = 2.4; // Arrival distance in meters
+    var MAX_ARROWS = 60;
+    var SPACING = 1.15; // meters between arrows
+    var TARGET_RADIUS = 2.2; // Arrival distance in meters
     var ANGLE_OFFSET = 180; // Rotation offset for PlayCanvas plane forward vector
 
     // ─────────────────────────────────────────────────────────────
@@ -59,8 +59,7 @@
         },
         floor04: {
             'elev':         { x: 2.82,   z: 24.65, edges: ['junction'] },
-            'junction':     { x: 0.08,   z: 24.32, edges: ['elev', 'dept_hall', 'mid', 'door_9428', 'door_9421'] },
-            'door_9428':    { x: 1.68,   z: 21.87, edges: ['junction'] },
+            'junction':     { x: 0.08,   z: 24.32, edges: ['elev', 'dept_hall', 'mid', 'door_9421'] },
             'door_9421':    { x: 2.98,   z: 21.74, edges: ['junction'] },
             'dept_hall':    { x: 8.00,   z: 24.32, edges: ['junction', 'dept_office'] },
             'dept_office':  { x: 16.50,  z: 24.32, edges: ['dept_hall'] },
@@ -80,9 +79,10 @@
         },
         inside: {
             'info':         { x: -6.50,  z: 2.50,  edges: ['lobby'] },
-            'lobby':        { x: -0.46,  z: 2.50,  edges: ['info', 'junc'] },
-            'junc':         { x: 6.80,   z: 2.50,  edges: ['lobby', 'elev'] },
-            'elev':         { x: 6.80,   z: -3.20, edges: ['junc'] }
+            'lobby':        { x: -0.46,  z: 2.50,  edges: ['info', 'junc', 'elev'] },
+            'junc':         { x: 6.80,   z: 2.50,  edges: ['lobby', 'door_floor01'] },
+            'door_floor01': { x: 7.50,   z: 0.50,  edges: ['junc'] },
+            'elev':         { x: -7.70,  z: -0.40, edges: ['lobby', 'info'] }
         }
     };
 
@@ -208,34 +208,34 @@
         }
 
         var chevrons = [
-            { y: 55,  w: 62, h: 36, thick: 14, alpha: 1.0 },
-            { y: 110, w: 72, h: 42, thick: 16, alpha: 0.82 },
-            { y: 170, w: 82, h: 48, thick: 18, alpha: 0.58 }
+            { y: 65,  w: 46, h: 26, thick: 10, alpha: 1.0 },
+            { y: 115, w: 54, h: 30, thick: 11, alpha: 0.85 },
+            { y: 165, w: 62, h: 34, thick: 12, alpha: 0.62 }
         ];
 
         chevrons.forEach(function (ch) {
             ctx.save();
             ctx.globalAlpha = ch.alpha;
 
-            // Outer Cyan Glow
+            // Outer Cyan Subtle Glow
             ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 28;
+            ctx.shadowBlur = 12;
             ctx.fillStyle = '#0891b2';
-            drawChevronPath(128, ch.y, ch.w + 5, ch.h + 5, ch.thick + 5);
+            drawChevronPath(128, ch.y, ch.w + 2, ch.h + 2, ch.thick + 2);
             ctx.fill();
 
             // Mid Electric Blue / Cyan
             ctx.shadowColor = '#38bdf8';
-            ctx.shadowBlur = 14;
+            ctx.shadowBlur = 6;
             ctx.fillStyle = '#38bdf8';
             drawChevronPath(128, ch.y, ch.w, ch.h, ch.thick);
             ctx.fill();
 
             // Core White Beam
             ctx.shadowColor = '#ffffff';
-            ctx.shadowBlur = 6;
+            ctx.shadowBlur = 4;
             ctx.fillStyle = '#ffffff';
-            drawChevronPath(128, ch.y + 2, ch.w - 12, ch.h - 8, ch.thick - 6);
+            drawChevronPath(128, ch.y + 1, ch.w - 8, ch.h - 5, ch.thick - 4);
             ctx.fill();
 
             ctx.restore();
@@ -460,7 +460,7 @@
         if (targetRing) {
             targetRing.enabled = true;
             targetRing.setPosition(targetPos.x, arrowY + 0.01, targetPos.z);
-            var ringScale = 2.2 + Math.sin(navTime * 4.0) * 0.3;
+            var ringScale = 1.4 + Math.sin(navTime * 4.0) * 0.2;
             targetRing.setLocalScale(ringScale, 1.0, ringScale);
             targetRing.setEulerAngles(0, navTime * 30.0, 0);
         }
@@ -477,8 +477,8 @@
             totalDist += slen;
         }
 
-        var startOffset = 1.2;
-        var availableDist = totalDist - startOffset - 0.9;
+        var startOffset = 1.7;
+        var availableDist = totalDist - startOffset - 0.6;
         var arrowCount = Math.min(MAX_ARROWS, Math.max(0, Math.floor(availableDist / SPACING)));
 
         for (var i = 0; i < MAX_ARROWS; i++) {
@@ -533,9 +533,9 @@
                 arrow.setPosition(px, arrowY, pz);
                 arrow.setEulerAngles(0, angleDeg, 0);
 
-                // Animated wave pulse flowing forward toward target
+                // Animated wave pulse flowing forward toward target (sleek compact arrow)
                 var wave = (Math.sin(navTime * 6.5 - i * 0.55) + 1.0) * 0.5;
-                arrow.setLocalScale(0.85 + 0.22 * wave, 1.0, 1.10 + 0.28 * wave);
+                arrow.setLocalScale(0.38 + 0.08 * wave, 1.0, 0.48 + 0.10 * wave);
             } else {
                 if (arrow.enabled) arrow.enabled = false;
             }

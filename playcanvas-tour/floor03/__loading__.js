@@ -13,8 +13,29 @@ pc.script.createLoadingScreen((app) => {
 
     // Elevator Modal Controller
     window.showElevatorModal = function () {
+        if (document.exitPointerLock) {
+            try { document.exitPointerLock(); } catch (e) {}
+        }
         if (elevatorModal) elevatorModal.style.display = 'flex';
     };
+
+    window.closeElevatorModal = function () {
+        if (elevatorModal) elevatorModal.style.display = 'none';
+    };
+
+    if (elevatorModal) {
+        elevatorModal.addEventListener('click', (e) => {
+            if (e.target === elevatorModal) {
+                window.closeElevatorModal();
+            }
+        });
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            window.closeElevatorModal();
+        }
+    });
 
     // Portal to Room 9524
     window.portalTo9524 = function () {

@@ -142,6 +142,82 @@ header {
   color: #ffffff;
 }
 
+/* ─── DROPDOWN NAV MENU ─── */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown > .nav-dropdown-toggle {
+  color: #e0f2fe;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Prompt', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.nav-dropdown > .nav-dropdown-toggle:hover {
+  color: #fff;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 18, 35, 0.97);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 230px;
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown.open .nav-dropdown-menu {
+  display: flex;
+}
+
+.nav-dropdown-menu a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  padding: 9px 14px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.15s ease;
+}
+
+.nav-dropdown-menu a:hover {
+  background: rgba(249, 87, 56, 0.18);
+  color: #fff;
+}
+
+.nav-dropdown-menu .dd-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 4px 8px;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
@@ -165,6 +241,19 @@ header {
 .btn-nav-outline:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: #fff;
+}
+
+.btn-team {
+  background: rgba(249, 87, 56, 0.18);
+  border-color: rgba(249, 87, 56, 0.7);
+  color: #fff;
+}
+
+.btn-team:hover {
+  background: #f95738;
+  border-color: #f95738;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(249, 87, 56, 0.45);
 }
 
 .btn-nav-solid {
@@ -430,14 +519,16 @@ header {
 .floor-btn-opt {
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 10px;
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
   color: #334155;
-  padding: 12px 16px;
+  padding: 13px 16px;
   border-radius: 12px;
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   transition: all 0.2s ease;
 }

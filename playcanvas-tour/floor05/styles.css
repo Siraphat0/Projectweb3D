@@ -851,6 +851,7 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
     display: none;
     align-items: center;
     justify-content: center;
+    pointer-events: auto !important;
 }
 
 .elevator-modal-card {
@@ -863,6 +864,7 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
     width: 90%;
     text-align: center;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+    pointer-events: auto !important;
 }
 
 .elevator-modal-icon {
@@ -890,18 +892,27 @@ body:has(.hud-dropdown-wrap.open) .hotspot-3d {
 }
 
 .elevator-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-top: 18px;
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    font-size: 13px;
+    padding: 8px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    color: #64748b;
+    cursor: pointer !important;
+    font-size: 13.5px;
+    font-weight: 600;
     font-family: inherit;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    pointer-events: auto !important;
 }
 
 .elevator-modal-close:hover {
-    color: #ea580c;
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
 }
 
 /* ═══════════════════════════════════════════════════════════ */

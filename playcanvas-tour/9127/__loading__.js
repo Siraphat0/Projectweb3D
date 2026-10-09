@@ -14,7 +14,7 @@ pc.script.createLoadingScreen((app) => {
     window.portalToFloor01 = function () {
         if (portalFade) portalFade.classList.add('active');
         setTimeout(() => {
-            window.location.href = '../floor01/';
+            window.location.href = '../floor01/?from=9127';
         }, 500);
     };
 

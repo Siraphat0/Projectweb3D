@@ -17,11 +17,48 @@ pc.script.createLoadingScreen((app) => {
 
     // Elevator Modal Controller
     window.showElevatorModal = function () {
+        if (document.exitPointerLock) {
+            try { document.exitPointerLock(); } catch (e) {}
+        }
         if (elevatorModal) elevatorModal.style.display = 'flex';
     };
 
+    window.closeElevatorModal = function () {
+        if (elevatorModal) elevatorModal.style.display = 'none';
+    };
+
+    if (elevatorModal) {
+        elevatorModal.addEventListener('click', (e) => {
+            if (e.target === elevatorModal) {
+                window.closeElevatorModal();
+            }
+        });
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            window.closeElevatorModal();
+        }
+    });
+
+    function recordFloor05Return(roomName) {
+        try {
+            if (window._activeWalker && window._activeWalker.entity) {
+                var p = window._activeWalker.entity.getPosition();
+                var eu = window._activeWalker.eulers;
+                sessionStorage.setItem('floor05_return_spawn', JSON.stringify({
+                    x: p.x, y: p.y, z: p.z,
+                    pitch: eu ? (eu.x || 0) : 0,
+                    yaw: eu ? (eu.y || 0) : 0,
+                    room: roomName
+                }));
+            }
+        } catch (e) {}
+    }
+
     // Portal to Room 9524
     window.portalTo9524 = function () {
+        recordFloor05Return('9524');
         if (portalFade) portalFade.classList.add('active');
         setTimeout(() => {
             window.location.href = '../9524/';
@@ -30,6 +67,7 @@ pc.script.createLoadingScreen((app) => {
 
     // Portal to Room 9525
     window.portalTo9525 = function () {
+        recordFloor05Return('9525');
         if (portalFade) portalFade.classList.add('active');
         setTimeout(() => {
             window.location.href = '../9525/';

@@ -39,8 +39,23 @@ FpsWalker.prototype.initialize = function () {
     this.eulers       = new pc.Vec3();
     this.targetEulers = new pc.Vec3();
     var angles = this.entity.getLocalEulerAngles();
-    this.eulers.x = this.targetEulers.x = angles.x || 0;
-    this.eulers.y = this.targetEulers.y = angles.y || 0;
+    var pitch = angles.x || 0;
+    var yaw   = angles.y || 0;
+    var roll  = angles.z || 0;
+
+    // ─── ป้องกันปัญหากล้องกลับหัว (Inverted / Upside-down camera fix) ───
+    if (Math.abs(Math.abs(roll) - 180) < 45 || Math.abs(pitch) > 85) {
+        if (Math.abs(Math.abs(roll) - 180) < 45) {
+            pitch = (pitch > 0) ? (180 - pitch) : (-180 - pitch);
+            yaw = (yaw + 180) % 360;
+        }
+        pitch = pc.math.clamp(pitch, -85, 85);
+        roll = 0;
+    }
+
+    this.eulers.set(pitch, yaw, 0);
+    this.targetEulers.set(pitch, yaw, 0);
+    this.entity.setEulerAngles(pitch, yaw, 0);
     this.isDragging = false;
     this.lastX = 0;
     this.lastY = 0;

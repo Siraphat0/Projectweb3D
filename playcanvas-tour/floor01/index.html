@@ -11,9 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <style></style>
     <link rel="manifest" href="manifest.json">
-    
+
     <script src="playcanvas-stable.min.js"></script>
     <script src="__settings__.js"></script>
 
@@ -148,15 +147,19 @@
             </div>
 
             <!-- Utility Buttons -->
-            <button class="hud-btn" id="btn-nav-guide" onclick="window.toggleNavMenu && window.toggleNavMenu();" title="ระบบนำทางไปยังจุดต่างๆ (Navigate)" style="background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(2,132,199,0.35)); border-color:rgba(56,189,248,0.5);">
+            <button class="hud-btn" id="btn-nav-guide" onclick="window.toggleNavMenu && window.toggleNavMenu();"
+                title="ระบบนำทางไปยังจุดต่างๆ (Navigate)"
+                style="background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(2,132,199,0.35)); border-color:rgba(56,189,248,0.5);">
                 <span>🧭</span>
                 <span>นำทาง</span>
             </button>
             <a href="../map/" class="hud-btn" title="เปิดแผนที่อาคาร 3D">
-
+                <span>🗺️</span>
                 <span>แผนที่ 3D</span>
             </a>
-            <button class="hud-btn" id="btn-hotspot-editor" onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();" title="เครื่องมือวาง Hotspot (Ctrl+H)" style="display: none !important;">
+            <button class="hud-btn" id="btn-hotspot-editor"
+                onclick="window.toggleHotspotEditor && window.toggleHotspotEditor();"
+                title="เครื่องมือวาง Hotspot (Ctrl+H)" style="display: none !important;">
                 <span>📍</span>
                 <span>Hotspot</span>
             </button>
@@ -181,28 +184,30 @@
                 <p class="elevator-modal-sub">คุณอยู่ที่: ชั้น 1 ด้านใน (Floor 01)
                 </p>
                 <div class="elevator-modal-list">
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor05 && window.portalToFloor05();"
-                        >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor05 && window.portalToFloor05();">
                         🔺 ขึ้นชั้น 5 (Floor 05)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor04 && window.portalToFloor04();"
-                        >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor04 && window.portalToFloor04();">
                         🔺 ขึ้นชั้น 4 (Floor 04)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor03 && window.portalToFloor03();"
-                        >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor03 && window.portalToFloor03();">
                         🔺 ขึ้นชั้น 3 (Floor 03)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToFloor02 && window.portalToFloor02();"
-                        >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToFloor02 && window.portalToFloor02();">
                         🔺 ขึ้นชั้น 2 (Floor 02)
                     </button>
-                    <button class="hud-btn elevator-modal-btn-floor" onclick="window.portalToInside && window.portalToInside();"
-                        >
+                    <button class="hud-btn elevator-modal-btn-floor"
+                        onclick="window.portalToInside && window.portalToInside();">
                         🏛️ โถงกลางชั้น 1 (Main Lobby)
                     </button>
                 </div>
-                <button class="elevator-modal-close" onclick="document.getElementById('elevator-modal').style.display='none';">✕ ปิดหน้าต่าง</button>
+                <button class="elevator-modal-close"
+                    onclick="window.closeElevatorModal ? window.closeElevatorModal() : (document.getElementById('elevator-modal').style.display='none');">✕
+                    ปิดหน้าต่าง</button>
             </div>
         </div>
 
@@ -223,7 +228,8 @@
                 <div class="hs-panel-title">📍 Hotspot Editor</div>
                 <div class="hs-panel-subtitle">Admin Tool — กด Ctrl+H เพื่อเปิด/ปิด</div>
             </div>
-            <button onclick="window.closeHotspotEditor ? window.closeHotspotEditor() : window.toggleHotspotEditor()" class="hs-close-btn">✕ ปิด</button>
+            <button onclick="window.closeHotspotEditor ? window.closeHotspotEditor() : window.toggleHotspotEditor()"
+                class="hs-close-btn">✕ ปิด</button>
         </div>
 
         <!-- Current Position Box -->
@@ -240,11 +246,13 @@
             <div class="hs-form-title">⚙️ ตั้งค่า Hotspot ใหม่</div>
             <div class="hs-form-grid">
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ชื่อห้อง / จุด</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ชื่อห้อง /
+                        จุด</label>
                     <input id="hs-name" type="text" placeholder="เช่น ห้อง 9127" class="hs-input">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">คำอธิบาย (hint)</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">คำอธิบาย
+                        (hint)</label>
                     <input id="hs-hint" type="text" placeholder="เช่น กด E เพื่อเข้าห้อง" class="hs-input">
                 </div>
                 <div>
@@ -256,7 +264,8 @@
                     <input id="hs-url" type="text" placeholder="เช่น ../9127/" class="hs-input">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ระยะใกล้ Prompt (หน่วย: m)</label>
+                    <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:3px;">ระยะใกล้ Prompt
+                        (หน่วย: m)</label>
                     <input id="hs-prox" type="number" value="3" step="0.5" min="0.5" class="hs-input">
                 </div>
                 <div style="display:flex; gap:8px; margin-top:4px;">
@@ -287,11 +296,8 @@
     </div>
 
     <!-- Hotspot Editor Toggle Button (floating) -->
-    <button id="hs-editor-toggle-btn"
-        onclick="window.toggleHotspotEditor()"
-        title="เปิด Hotspot Editor (Ctrl+H)"
-        class="hs-toggle-btn"
-        style="display: none;">
+    <button id="hs-editor-toggle-btn" onclick="window.toggleHotspotEditor()" title="เปิด Hotspot Editor (Ctrl+H)"
+        class="hs-toggle-btn" style="display: none;">
         📍
     </button>
 
@@ -300,252 +306,252 @@
     <script src="__loading__.js"></script>
     <script src="../nav-guide.js"></script>
     <script>
-    // ═══════════════════════════════════════════════════════════
-    // HOTSPOT ADMIN EDITOR — Client-side JS
-    // ═══════════════════════════════════════════════════════════
-    (function() {
-        var editorOpen = false;
-        var pendingPos = null;
-        var hotspots = [];
-        var STORAGE_KEY = 'floor01_hotspots_v1';
-        var DEFAULT_HOTSPOTS = [{"id": "hs_1790865753234", "name": "ติดต่อฝ่ายวิชาการ/ธุรการ", "hint": "คลิกเพื่อดูข้อมูลนักศึกษา", "icon": "📍", "url": "https://computing.kku.ac.th/students", "prox": 3, "pos": {"x": -7.117, "y": 3.34, "z": -3.903}}, {"id": "hs_1790865815184", "name": "ห้อง9127", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9127/", "prox": 3, "pos": {"x": -26.087, "y": 3.34, "z": -20.398}}, {"id": "hs_1790938266824", "name": "ลิฟต์ชั้น 1", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3.5, "pos": {"x": 10.533, "y": 3.34, "z": -2.68}}];
+        // ═══════════════════════════════════════════════════════════
+        // HOTSPOT ADMIN EDITOR — Client-side JS
+        // ═══════════════════════════════════════════════════════════
+        (function () {
+            var editorOpen = false;
+            var pendingPos = null;
+            var hotspots = [];
+            var STORAGE_KEY = 'floor01_hotspots_v1';
+            var DEFAULT_HOTSPOTS = [{ "id": "hs_1790865753234", "name": "ติดต่อฝ่ายวิชาการ/ธุรการ", "hint": "คลิกเพื่อดูข้อมูลนักศึกษา", "icon": "📍", "url": "https://computing.kku.ac.th/students", "prox": 3, "pos": { "x": -7.117, "y": 3.34, "z": -3.903 } }, { "id": "hs_1790865815184", "name": "ห้อง9127", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9127/", "prox": 3, "pos": { "x": -26.087, "y": 3.34, "z": -20.398 } }, { "id": "hs_1790938266824", "name": "ลิฟต์ชั้น 1", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3.5, "pos": { "x": 10.533, "y": 3.34, "z": -2.68 } }];
 
-        try {
-            var saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                hotspots = JSON.parse(saved);
-                if (Array.isArray(hotspots)) {
-                    hotspots.forEach(function (h) {
-                        if (h && (h.id === 'hs_1790938266824' || (h.name && h.name.indexOf('ลิฟต์') !== -1))) {
-                            h.pos = { x: 10.533, y: 3.34, z: -2.68 };
-                            h.name = 'ลิฟต์ชั้น 1';
+            try {
+                var saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    hotspots = JSON.parse(saved);
+                    if (Array.isArray(hotspots)) {
+                        hotspots.forEach(function (h) {
+                            if (h && (h.id === 'hs_1790938266824' || (h.name && h.name.indexOf('ลิฟต์') !== -1))) {
+                                h.pos = { x: 10.533, y: 3.34, z: -2.68 };
+                                h.name = 'ลิฟต์ชั้น 1';
+                            }
+                        });
+                        saveToStorage();
+                    }
+                }
+                if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
+                    hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
+                    saveToStorage();
+                } else {
+                    var added = false;
+                    DEFAULT_HOTSPOTS.forEach(function (def) {
+                        if (!hotspots.some(function (h) { return h.id === def.id; })) {
+                            hotspots.push(JSON.parse(JSON.stringify(def)));
+                            added = true;
                         }
                     });
-                    saveToStorage();
-                }
-            }
-            if (!hotspots || !Array.isArray(hotspots) || hotspots.length === 0) {
-                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
-                saveToStorage();
-            } else {
-                var added = false;
-                DEFAULT_HOTSPOTS.forEach(function (def) {
-                    if (!hotspots.some(function (h) { return h.id === def.id; })) {
-                        hotspots.push(JSON.parse(JSON.stringify(def)));
-                        added = true;
+                    if (added) {
+                        saveToStorage();
                     }
-                });
-                if (added) {
-                    saveToStorage();
                 }
+            } catch (e) {
+                hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
             }
-        } catch (e) {
-            hotspots = JSON.parse(JSON.stringify(DEFAULT_HOTSPOTS));
-        }
 
-        function saveToStorage() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) {}
-        }
-
-        // ── Admin Mode Logic ──
-        var urlParams = new URLSearchParams(window.location.search);
-        var isAdmin = urlParams.has('admin') || urlParams.has('edit');
-        if (!isAdmin) {
-            try { sessionStorage.removeItem('admin_mode'); } catch (e) {}
-        }
-
-        function updateAdminVisibility() {
-            var hudBtn = document.getElementById('btn-hotspot-editor');
-            var floatBtn = document.getElementById('hs-editor-toggle-btn');
-            var panel = document.getElementById('hotspot-editor');
-            if (hudBtn) {
-                if (isAdmin) {
-                    hudBtn.style.setProperty('display', 'inline-flex', 'important');
-                    hudBtn.classList.add('admin-visible');
-                } else {
-                    hudBtn.style.setProperty('display', 'none', 'important');
-                    hudBtn.classList.remove('admin-visible');
-                }
+            function saveToStorage() {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotspots)); } catch (e) { }
             }
-            if (floatBtn) {
-                if (isAdmin && !editorOpen) {
-                    floatBtn.style.setProperty('display', 'flex', 'important');
-                } else {
-                    floatBtn.style.setProperty('display', 'none', 'important');
-                }
-            }
+
+            // ── Admin Mode Logic ──
+            var urlParams = new URLSearchParams(window.location.search);
+            var isAdmin = urlParams.has('admin') || urlParams.has('edit');
             if (!isAdmin) {
-                editorOpen = false;
-                if (panel) panel.style.setProperty('display', 'none', 'important');
+                try { sessionStorage.removeItem('admin_mode'); } catch (e) { }
             }
-        }
 
-        window.closeHotspotEditor = function() {
-            editorOpen = false;
-            var panel = document.getElementById('hotspot-editor');
-            var btn   = document.getElementById('hs-editor-toggle-btn');
-            if (panel) panel.style.setProperty('display', 'none', 'important');
-            if (btn) {
-                if (isAdmin) btn.style.setProperty('display', 'flex', 'important');
-                else btn.style.setProperty('display', 'none', 'important');
-            }
-        };
-
-        window.toggleHotspotEditor = function() {
-            editorOpen = !editorOpen;
-            var panel = document.getElementById('hotspot-editor');
-            var btn   = document.getElementById('hs-editor-toggle-btn');
-            if (panel) {
-                if (editorOpen) panel.style.setProperty('display', 'flex', 'important');
-                else panel.style.setProperty('display', 'none', 'important');
-            }
-            if (btn) {
-                if (isAdmin && !editorOpen) btn.style.setProperty('display', 'flex', 'important');
-                else btn.style.setProperty('display', 'none', 'important');
-            }
-            if (editorOpen) renderList();
-        };
-
-        // Show toggle button when HUD is visible (admin only)
-        window.addEventListener('hotspot-editor-ready', function() {
-            updateAdminVisibility();
-        });
-
-        // Keyboard Shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Secret shortcut: Ctrl + Shift + H toggles Admin Mode
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
-                e.preventDefault();
-                isAdmin = !isAdmin;
-                updateAdminVisibility();
-                if (isAdmin && !editorOpen) {
-                    window.toggleHotspotEditor();
-                } else if (!isAdmin && editorOpen) {
-                    window.closeHotspotEditor();
+            function updateAdminVisibility() {
+                var hudBtn = document.getElementById('btn-hotspot-editor');
+                var floatBtn = document.getElementById('hs-editor-toggle-btn');
+                var panel = document.getElementById('hotspot-editor');
+                if (hudBtn) {
+                    if (isAdmin) {
+                        hudBtn.style.setProperty('display', 'inline-flex', 'important');
+                        hudBtn.classList.add('admin-visible');
+                    } else {
+                        hudBtn.style.setProperty('display', 'none', 'important');
+                        hudBtn.classList.remove('admin-visible');
+                    }
                 }
-                return;
+                if (floatBtn) {
+                    if (isAdmin && !editorOpen) {
+                        floatBtn.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        floatBtn.style.setProperty('display', 'none', 'important');
+                    }
+                }
+                if (!isAdmin) {
+                    editorOpen = false;
+                    if (panel) panel.style.setProperty('display', 'none', 'important');
+                }
             }
-            // Normal shortcut: Ctrl + H toggles editor only if already Admin
-            if (isAdmin && (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
-                e.preventDefault();
-                window.toggleHotspotEditor();
-            }
-        });
 
-        // Force initial closed state
-        window.closeHotspotEditor();
-        updateAdminVisibility();
-
-        // Capture player position
-        window.hotspotEditorCapture = function() {
-            if (window._hotspotEditorGetPos) {
-                pendingPos = window._hotspotEditorGetPos();
-            } else {
-                // Fallback: ask user manually
-                var coords = prompt('ยังไม่ได้เชื่อมต่อกับ PlayCanvas\nกรอก position เอง (x,y,z):','0,3,0');
-                if (!coords) return;
-                var parts = coords.split(',').map(Number);
-                pendingPos = { x: parts[0]||0, y: parts[1]||3, z: parts[2]||0 };
-            }
-            if (!pendingPos) return;
-            document.getElementById('hs-form').style.display = 'block';
-            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
-            document.getElementById('hs-capture-btn').textContent = '✅ ตำแหน่งถูกบันทึก — กรอกข้อมูลด้านล่าง';
-        };
-
-        window.hotspotEditorCancelForm = function() {
-            pendingPos = null;
-            document.getElementById('hs-form').style.display = 'none';
-            document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
-            document.getElementById('hs-capture-btn').textContent = '📍 วางจุด Hotspot ที่ตำแหน่งนี้';
-        };
-
-        window.hotspotEditorSave = function() {
-            if (!pendingPos) { alert('กด "วางจุด Hotspot" ก่อนนะครับ'); return; }
-            var name  = document.getElementById('hs-name').value.trim()  || 'Hotspot';
-            var hint  = document.getElementById('hs-hint').value.trim()  || 'คลิกเพื่อเข้า';
-            var icon  = document.getElementById('hs-icon').value.trim()  || '🚪';
-            var url   = document.getElementById('hs-url').value.trim()   || '#';
-            var prox  = parseFloat(document.getElementById('hs-prox').value) || 3;
-
-            var hs = {
-                id: 'hs_' + Date.now(),
-                name: name, hint: hint, icon: icon, url: url, prox: prox,
-                pos: { x: +pendingPos.x.toFixed(3), y: +pendingPos.y.toFixed(3), z: +pendingPos.z.toFixed(3) }
+            window.closeHotspotEditor = function () {
+                editorOpen = false;
+                var panel = document.getElementById('hotspot-editor');
+                var btn = document.getElementById('hs-editor-toggle-btn');
+                if (panel) panel.style.setProperty('display', 'none', 'important');
+                if (btn) {
+                    if (isAdmin) btn.style.setProperty('display', 'flex', 'important');
+                    else btn.style.setProperty('display', 'none', 'important');
+                }
             };
-            hotspots.push(hs);
-            saveToStorage();
 
-            // Register with runtime if available
-            if (window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
+            window.toggleHotspotEditor = function () {
+                editorOpen = !editorOpen;
+                var panel = document.getElementById('hotspot-editor');
+                var btn = document.getElementById('hs-editor-toggle-btn');
+                if (panel) {
+                    if (editorOpen) panel.style.setProperty('display', 'flex', 'important');
+                    else panel.style.setProperty('display', 'none', 'important');
+                }
+                if (btn) {
+                    if (isAdmin && !editorOpen) btn.style.setProperty('display', 'flex', 'important');
+                    else btn.style.setProperty('display', 'none', 'important');
+                }
+                if (editorOpen) renderList();
+            };
 
-            hotspotEditorCancelForm();
-            document.getElementById('hs-name').value = '';
-            document.getElementById('hs-hint').value = '';
-            document.getElementById('hs-url').value  = '';
-            renderList();
-        };
-
-        window.hotspotEditorDelete = function(id) {
-            hotspots = hotspots.filter(function(h){ return h.id !== id; });
-            saveToStorage();
-            if (window._hotspotEditorUnregister) window._hotspotEditorUnregister(id);
-            renderList();
-        };
-
-        window.hotspotEditorExport = function() {
-            var lines = hotspots.map(function(h) {
-                return '    {\n' +
-                    '        id: \'' + h.id + '\',\n' +
-                    '        worldPos: new pc.Vec3(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + '),\n' +
-                    '        label: \'' + h.name + '\',\n' +
-                    '        hint:  \'' + h.hint + '\',\n' +
-                    '        icon:  \'' + h.icon + '\',\n' +
-                    '        url:   \'' + h.url  + '\',\n' +
-                    '        prox:  ' + h.prox + '\n' +
-                    '    }';
+            // Show toggle button when HUD is visible (admin only)
+            window.addEventListener('hotspot-editor-ready', function () {
+                updateAdminVisibility();
             });
-            var code = '// === วางใน __game-scripts.js ===\nvar DYNAMIC_HOTSPOTS = [\n' + lines.join(',\n') + '\n];';
-            var box = document.getElementById('hs-export-box');
-            var txt = document.getElementById('hs-export-text');
-            if (txt) txt.value = code;
-            if (box) box.style.display = 'block';
-            try { txt.select(); document.execCommand('copy'); } catch(e) {}
-        };
 
-        function renderList() {
-            var el = document.getElementById('hs-list');
-            if (!el) return;
-            if (hotspots.length === 0) {
-                el.innerHTML = '<div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>';
-                return;
+            // Keyboard Shortcuts
+            document.addEventListener('keydown', function (e) {
+                // Secret shortcut: Ctrl + Shift + H toggles Admin Mode
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+                    e.preventDefault();
+                    isAdmin = !isAdmin;
+                    updateAdminVisibility();
+                    if (isAdmin && !editorOpen) {
+                        window.toggleHotspotEditor();
+                    } else if (!isAdmin && editorOpen) {
+                        window.closeHotspotEditor();
+                    }
+                    return;
+                }
+                // Normal shortcut: Ctrl + H toggles editor only if already Admin
+                if (isAdmin && (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
+                    e.preventDefault();
+                    window.toggleHotspotEditor();
+                }
+            });
+
+            // Force initial closed state
+            window.closeHotspotEditor();
+            updateAdminVisibility();
+
+            // Capture player position
+            window.hotspotEditorCapture = function () {
+                if (window._hotspotEditorGetPos) {
+                    pendingPos = window._hotspotEditorGetPos();
+                } else {
+                    // Fallback: ask user manually
+                    var coords = prompt('ยังไม่ได้เชื่อมต่อกับ PlayCanvas\nกรอก position เอง (x,y,z):', '0,3,0');
+                    if (!coords) return;
+                    var parts = coords.split(',').map(Number);
+                    pendingPos = { x: parts[0] || 0, y: parts[1] || 3, z: parts[2] || 0 };
+                }
+                if (!pendingPos) return;
+                document.getElementById('hs-form').style.display = 'block';
+                document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
+                document.getElementById('hs-capture-btn').textContent = '✅ ตำแหน่งถูกบันทึก — กรอกข้อมูลด้านล่าง';
+            };
+
+            window.hotspotEditorCancelForm = function () {
+                pendingPos = null;
+                document.getElementById('hs-form').style.display = 'none';
+                document.getElementById('hs-capture-btn').style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
+                document.getElementById('hs-capture-btn').textContent = '📍 วางจุด Hotspot ที่ตำแหน่งนี้';
+            };
+
+            window.hotspotEditorSave = function () {
+                if (!pendingPos) { alert('กด "วางจุด Hotspot" ก่อนนะครับ'); return; }
+                var name = document.getElementById('hs-name').value.trim() || 'Hotspot';
+                var hint = document.getElementById('hs-hint').value.trim() || 'คลิกเพื่อเข้า';
+                var icon = document.getElementById('hs-icon').value.trim() || '🚪';
+                var url = document.getElementById('hs-url').value.trim() || '#';
+                var prox = parseFloat(document.getElementById('hs-prox').value) || 3;
+
+                var hs = {
+                    id: 'hs_' + Date.now(),
+                    name: name, hint: hint, icon: icon, url: url, prox: prox,
+                    pos: { x: +pendingPos.x.toFixed(3), y: +pendingPos.y.toFixed(3), z: +pendingPos.z.toFixed(3) }
+                };
+                hotspots.push(hs);
+                saveToStorage();
+
+                // Register with runtime if available
+                if (window._hotspotEditorRegister) window._hotspotEditorRegister(hs);
+
+                hotspotEditorCancelForm();
+                document.getElementById('hs-name').value = '';
+                document.getElementById('hs-hint').value = '';
+                document.getElementById('hs-url').value = '';
+                renderList();
+            };
+
+            window.hotspotEditorDelete = function (id) {
+                hotspots = hotspots.filter(function (h) { return h.id !== id; });
+                saveToStorage();
+                if (window._hotspotEditorUnregister) window._hotspotEditorUnregister(id);
+                renderList();
+            };
+
+            window.hotspotEditorExport = function () {
+                var lines = hotspots.map(function (h) {
+                    return '    {\n' +
+                        '        id: \'' + h.id + '\',\n' +
+                        '        worldPos: new pc.Vec3(' + h.pos.x + ', ' + h.pos.y + ', ' + h.pos.z + '),\n' +
+                        '        label: \'' + h.name + '\',\n' +
+                        '        hint:  \'' + h.hint + '\',\n' +
+                        '        icon:  \'' + h.icon + '\',\n' +
+                        '        url:   \'' + h.url + '\',\n' +
+                        '        prox:  ' + h.prox + '\n' +
+                        '    }';
+                });
+                var code = '// === วางใน __game-scripts.js ===\nvar DYNAMIC_HOTSPOTS = [\n' + lines.join(',\n') + '\n];';
+                var box = document.getElementById('hs-export-box');
+                var txt = document.getElementById('hs-export-text');
+                if (txt) txt.value = code;
+                if (box) box.style.display = 'block';
+                try { txt.select(); document.execCommand('copy'); } catch (e) { }
+            };
+
+            function renderList() {
+                var el = document.getElementById('hs-list');
+                if (!el) return;
+                if (hotspots.length === 0) {
+                    el.innerHTML = '<div class="hs-empty-state">ยังไม่มี Hotspot — กดปุ่มด้านบนเพื่อเพิ่ม</div>';
+                    return;
+                }
+                el.innerHTML = hotspots.map(function (h, i) {
+                    return '<div class="hs-item-card">' +
+                        '<div class="hs-item-row">' +
+                        '<div>' +
+                        '<div class="hs-item-title">' + ((!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1) ? ((h.name && h.name.indexOf('ลิฟต์') !== -1) ? '🛗' : '📍') : h.icon) + ' ' + (h.name || 'Hotspot') + '</div>' +
+                        '<div class="hs-item-pos">x:' + h.pos.x + ' y:' + h.pos.y + ' z:' + h.pos.z + '</div>' +
+                        '<div class="hs-item-url">→ ' + h.url + ' (Prox: ' + h.prox + 'm)</div>' +
+                        '</div>' +
+                        '<button onclick="window.hotspotEditorDelete(\'' + h.id + '\')" class="hs-item-delete-btn">🗑️</button>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
             }
-            el.innerHTML = hotspots.map(function(h, i) {
-                return '<div class="hs-item-card">' +
-                    '<div class="hs-item-row">' +
-                    '<div>' +
-                    '<div class="hs-item-title">' + ((!h.icon || h.icon.indexOf('') !== -1 || h.icon.indexOf('๐') !== -1) ? ((h.name && h.name.indexOf('ลิฟต์') !== -1) ? '🛗' : '📍') : h.icon) + ' ' + (h.name || 'Hotspot') + '</div>' +
-                    '<div class="hs-item-pos">x:' + h.pos.x + ' y:' + h.pos.y + ' z:' + h.pos.z + '</div>' +
-                    '<div class="hs-item-url">→ ' + h.url + ' (Prox: ' + h.prox + 'm)</div>' +
-                    '</div>' +
-                    '<button onclick="window.hotspotEditorDelete(\'' + h.id + '\')" class="hs-item-delete-btn">🗑️</button>' +
-                    '</div>' +
-                    '</div>';
-            }).join('');
-        }
 
-        // Update live position display (called from game loop)
-        setInterval(function() {
-            var el = document.getElementById('hs-live-pos');
-            if (!el || !editorOpen) return;
-            if (window._hotspotEditorGetPos) {
-                var p = window._hotspotEditorGetPos();
-                el.textContent = 'x: ' + p.x.toFixed(2) + '   y: ' + p.y.toFixed(2) + '   z: ' + p.z.toFixed(2);
-            }
-        }, 200);
+            // Update live position display (called from game loop)
+            setInterval(function () {
+                var el = document.getElementById('hs-live-pos');
+                if (!el || !editorOpen) return;
+                if (window._hotspotEditorGetPos) {
+                    var p = window._hotspotEditorGetPos();
+                    el.textContent = 'x: ' + p.x.toFixed(2) + '   y: ' + p.y.toFixed(2) + '   z: ' + p.z.toFixed(2);
+                }
+            }, 200);
 
-        renderList();
-    })();
+            renderList();
+        })();
     </script>
 </body>
 

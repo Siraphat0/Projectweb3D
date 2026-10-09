@@ -39,8 +39,23 @@ FpsWalker.prototype.initialize = function () {
     this.eulers       = new pc.Vec3();
     this.targetEulers = new pc.Vec3();
     var angles = this.entity.getLocalEulerAngles();
-    this.eulers.x = this.targetEulers.x = angles.x || 0;
-    this.eulers.y = this.targetEulers.y = angles.y || 0;
+    var pitch = angles.x || 0;
+    var yaw   = angles.y || 0;
+    var roll  = angles.z || 0;
+
+    // ─── ป้องกันปัญหากล้องกลับหัว (Inverted / Upside-down camera fix) ───
+    if (Math.abs(Math.abs(roll) - 180) < 45 || Math.abs(pitch) > 85) {
+        if (Math.abs(Math.abs(roll) - 180) < 45) {
+            pitch = (pitch > 0) ? (180 - pitch) : (-180 - pitch);
+            yaw = (yaw + 180) % 360;
+        }
+        pitch = pc.math.clamp(pitch, -85, 85);
+        roll = 0;
+    }
+
+    this.eulers.set(pitch, yaw, 0);
+    this.targetEulers.set(pitch, yaw, 0);
+    this.entity.setEulerAngles(pitch, yaw, 0);
     this.isDragging = false;
     this.lastX = 0;
     this.lastY = 0;
@@ -50,6 +65,36 @@ FpsWalker.prototype.initialize = function () {
     // Spawn point at elevator (Floor 04) — X,Y,Z ผ่านการทดสอบ in-game
     this.initialPos = new pc.Vec3(0.08, 3.15, 24.32);
     this.initialRot = this.entity.getEulerAngles().clone();
+
+    // ── ตรวจสอบตำแหน่งเดิมเมื่อกลับมาจากห้อง (Return from Room Memory) ──
+    var returnData = null;
+    try {
+        var rawReturn = sessionStorage.getItem('floor04_return_spawn');
+        if (rawReturn) {
+            returnData = JSON.parse(rawReturn);
+            sessionStorage.removeItem('floor04_return_spawn');
+        }
+    } catch (e) {}
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var fromRoom = urlParams.get('from');
+    if (!returnData && fromRoom) {
+        var fallbackHotspots = {
+            '9422': { x: 6.774, y: 3.15, z: 12.2, pitch: 0, yaw: 0 },
+            '9421': { x: 2.976, y: 3.15, z: 11.8, pitch: 0, yaw: 0 }
+        };
+        if (fallbackHotspots[fromRoom]) returnData = fallbackHotspots[fromRoom];
+    }
+
+    if (returnData && typeof returnData.x === 'number') {
+        this.initialPos = new pc.Vec3(returnData.x, returnData.y, returnData.z);
+        if (typeof returnData.yaw === 'number') {
+            this.initialRot = new pc.Vec3(returnData.pitch || 0, returnData.yaw, 0);
+            this.eulers.set(this.initialRot.x, this.initialRot.y, 0);
+            this.targetEulers.set(this.initialRot.x, this.initialRot.y, 0);
+        }
+    }
+
     this.elevatorPos = new pc.Vec2(2.823, 24.654);
     this._spawnLock = 15;
     this.entity.setPosition(this.initialPos);
@@ -164,37 +209,59 @@ FpsWalker.prototype.initialize = function () {
             action: function () { if (window.showElevatorModal) window.showElevatorModal(); }
         },
         {
-            id: "hs_1791026569984",
+            id: "hs_1791314190102",
             name: "ห้อง9428",
-            hint: "คลิกเพื่อเข้า",
+            hint: "กด [E] หรือคลิกเพื่อดูข้อมูล",
             icon: "🚪",
             url: "#",
-            prox: 3,
-            worldPos: new pc.Vec3(1.679, 3.15, 21.867),
-            pos: { x: 1.679, y: 3.15, z: 21.867 },
+            prox: 2.0,
+            worldPos: new pc.Vec3(1.367, 3.15, 21.828),
+            pos: { x: 1.367, y: 3.15, z: 21.828 },
             action: function () { handleHotspotAction('#', 'ห้อง9428', null); }
         },
         {
-            id: "hs_1790938103607",
+            id: "hs_1791314173243",
+            name: "ห้อง9421",
+            hint: "กด [E] หรือคลิกเพื่อเข้าห้อง",
+            icon: "🚪",
+            url: "../9422/",
+            prox: 2.0,
+            worldPos: new pc.Vec3(2.976, 3.15, 12.765),
+            pos: { x: 2.976, y: 3.15, z: 12.765 },
+            action: function () { if (window.portalTo9422) window.portalTo9422(); else window.location.href = '../9422/'; }
+        },
+        {
+            id: "hs_1791314089737",
             name: "ห้อง9422",
             hint: "กด [E] หรือคลิกเพื่อเข้าห้อง",
             icon: "🚪",
             url: "../9422/",
             prox: 3,
-            worldPos: new pc.Vec3(-5.478, 3.15, -1.505),
-            pos: { x: -5.478, y: 3.15, z: -1.505 },
+            worldPos: new pc.Vec3(6.774, 3.15, 13.191),
+            pos: { x: 6.774, y: 3.15, z: 13.191 },
             action: function () { if (window.portalTo9422) window.portalTo9422(); else window.location.href = '../9422/'; }
         },
         {
-            id: "hs_1790919204488",
-            name: "ห้อง9421",
+            id: "hs_1790938136803",
+            name: "ห้อง9427",
             hint: "คลิกเพื่อเข้า",
             icon: "🚪",
             url: "#",
             prox: 3,
-            worldPos: new pc.Vec3(2.975, 3.15, 21.735),
-            pos: { x: 2.975, y: 3.15, z: 21.735 },
-            action: function () { handleHotspotAction('#', 'ห้อง9421', null); }
+            worldPos: new pc.Vec3(-1.573, 3.25, 25.781),
+            pos: { x: -1.573, y: 3.25, z: 25.781 },
+            action: function () { handleHotspotAction('#', 'ห้อง9427', null); }
+        },
+        {
+            id: "hs_1790919266134",
+            name: "ห้อง9423",
+            hint: "คลิกเพื่อเข้า",
+            icon: "🚪",
+            url: "#",
+            prox: 3,
+            worldPos: new pc.Vec3(4.062, 2.665, -5.445),
+            pos: { x: 4.062, y: 2.665, z: -5.445 },
+            action: function () { handleHotspotAction('#', 'ห้อง9423', null); }
         }
     ];
     this.hotspots = defaultHotspots.slice();
@@ -222,21 +289,39 @@ FpsWalker.prototype.initialize = function () {
             }
         }
 
+        function saveCurrentSpawn(roomKey) {
+            try {
+                var p = self.entity.getPosition();
+                var data = {
+                    x: p.x,
+                    y: p.y,
+                    z: p.z,
+                    pitch: self.eulers.x || 0,
+                    yaw: self.eulers.y || 0,
+                    room: roomKey
+                };
+                sessionStorage.setItem('floor04_return_spawn', JSON.stringify(data));
+            } catch (e) {}
+        }
+
         // 2. Room 9421 / 9422 (ใช้ไฟล์เดียวกัน)
         if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1 ||
             url.indexOf('9421') !== -1 || name.indexOf('9421') !== -1) {
+            saveCurrentSpawn(name.indexOf('9421') !== -1 ? '9421' : '9422');
             if (window.portalTo9422) { window.portalTo9422(); return; }
             else { window.location.href = '../9422/'; return; }
         }
 
         // Room 9524 (ห้อง 9524 ชั้น 5)
         if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
+            saveCurrentSpawn('9524');
             if (window.portalTo9524) { window.portalTo9524(); return; }
             else { window.location.href = '../9524/'; return; }
         }
 
         // 3. Room 9127
         if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
+            saveCurrentSpawn('9127');
             if (window.portalTo9127) { window.portalTo9127(); return; }
             else { window.location.href = '../9127/'; return; }
         }
@@ -381,7 +466,16 @@ FpsWalker.prototype.initialize = function () {
         if (saved) {
             var list = JSON.parse(saved);
             if (Array.isArray(list)) {
-                list.forEach(function (item) {
+                var filtered = list.filter(function (item) {
+                    if (!item) return false;
+                    if (item.id === 'hs_elevator_floor04' || item.name === 'ลิฟต์ชั้น 4') return false;
+                    if (item.id === 'hs_meeting_room_f04' || (item.name && item.name.indexOf('ห้องประชุม') !== -1)) return false;
+                    // Filter out old stale IDs replaced by new user pins
+                    if (item.id === 'hs_1791026569984' || item.id === 'hs_1790919204488' || item.id === 'hs_1790938103607') return false;
+                    return true;
+                });
+                try { localStorage.setItem('floor04_hotspots_v1', JSON.stringify(filtered)); } catch (e) {}
+                filtered.forEach(function (item) {
                     window._hotspotEditorRegister(item);
                 });
             }

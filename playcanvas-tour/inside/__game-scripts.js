@@ -7,10 +7,23 @@ FirstPersonController.attributes.add("lookSpeed", { type: "number", default: 0.2
 FirstPersonController.prototype.initialize = function () {
     this.eulers = new pc.Vec3();
     var angles = this.entity.getLocalEulerAngles();
-    this.eulers.x = angles.x || 0;
-    this.eulers.y = angles.y || 0;
+    var pitch = angles.x || 0;
+    var yaw   = angles.y || 0;
+    var roll  = angles.z || 0;
 
-    this.targetEulers = new pc.Vec3(this.eulers.x, this.eulers.y, 0);
+    // ─── ป้องกันปัญหากล้องกลับหัว (Inverted / Upside-down camera fix) ───
+    if (Math.abs(Math.abs(roll) - 180) < 45 || Math.abs(pitch) > 85) {
+        if (Math.abs(Math.abs(roll) - 180) < 45) {
+            pitch = (pitch > 0) ? (180 - pitch) : (-180 - pitch);
+            yaw = (yaw + 180) % 360;
+        }
+        pitch = pc.math.clamp(pitch, -85, 85);
+        roll = 0;
+    }
+
+    this.eulers.set(pitch, yaw, 0);
+    this.targetEulers = new pc.Vec3(pitch, yaw, 0);
+    this.entity.setEulerAngles(pitch, yaw, 0);
     this.currentVelocity = new pc.Vec3();
 
     this.isDragging = false;
@@ -611,15 +624,24 @@ FirstPersonController.prototype.update = function (dt) {
                 var toHs = hs.worldPos.clone().sub(camPos).normalize();
                 var dot = camFwd ? camFwd.dot(toHs) : 1;
 
-                if (dist <= proxDist && dot > 0.15 && screenPos.z > 0) {
+                var isElev = hs.id === 'hs_elevator_main' || (hs.name && hs.name.indexOf('ลิฟต์') !== -1) || (hs.url && hs.url.indexOf('elevator') !== -1);
+                var visibleDist = isElev ? 25.0 : proxDist;
+                if (dist <= visibleDist && dot > 0.15 && screenPos.z > 0) {
                     el.style.display = 'flex';
                     el.style.left = Math.round(screenPos.x) + 'px';
                     el.style.top = Math.round(screenPos.y) + 'px';
-                    var scale = pc.math.clamp(1.25 - (dist / proxDist) * 0.25, 0.85, 1.25);
+                    var scale = isElev ? pc.math.clamp(1.2 - (dist / 25.0) * 0.35, 0.8, 1.25) : pc.math.clamp(1.25 - (dist / proxDist) * 0.25, 0.85, 1.25);
                     el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(2) + ')';
                 } else {
                     el.style.display = 'none';
                 }
+            }
+        }
+
+        var distToElev = Math.hypot(pPos.x - (-7.7), pPos.z - (-0.4));
+        if (distToElev < 3.5) {
+            if (app.keyboard.wasPressed(pc.KEY_E)) {
+                if (window.showElevatorModal) window.showElevatorModal();
             }
         }
     }

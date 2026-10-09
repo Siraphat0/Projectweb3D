@@ -34,12 +34,27 @@ FpsWalker.prototype.initialize = function () {
     this.targetEulers = new pc.Vec3();
 
     var angles = this.entity.getLocalEulerAngles();
-    this.eulers.x = this.targetEulers.x = angles.x || 0;
-    this.eulers.y = this.targetEulers.y = angles.y || 0;
+    var pitch = angles.x || 0;
+    var yaw   = angles.y || 0;
+    var roll  = angles.z || 0;
+
+    // ─── แก้ปัญหากล้องกลับหัว (Inverted / Upside-down camera fix) ───
+    if (Math.abs(Math.abs(roll) - 180) < 45 || Math.abs(pitch) > 85) {
+        if (Math.abs(Math.abs(roll) - 180) < 45) {
+            pitch = (pitch > 0) ? (180 - pitch) : (-180 - pitch);
+            yaw = (yaw + 180) % 360;
+        }
+        pitch = pc.math.clamp(pitch, -85, 85);
+        roll = 0;
+    }
+
+    this.eulers.set(pitch, yaw, 0);
+    this.targetEulers.set(pitch, yaw, 0);
+    this.entity.setEulerAngles(pitch, yaw, 0);
 
     this.currentVelocity = new pc.Vec3();
     this.initialPos = this.entity.getPosition().clone();
-    this.initialRot = this.entity.getEulerAngles().clone();
+    this.initialRot = new pc.Vec3(pitch, yaw, 0);
 
     this.isDragging = false;
     this.lastX = 0;
@@ -47,11 +62,15 @@ FpsWalker.prototype.initialize = function () {
 
     // Smooth proxy floor to guarantee zero snagging
     this._createProxyFloor(1.655);
+    this._spawnLock = 15;
 
     if (this.entity.rigidbody) {
+        this.entity.rigidbody.linearVelocity = pc.Vec3.ZERO;
+        this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
         this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
     } else {
         this.entity.setPosition(this.initialPos);
+        this.entity.setEulerAngles(this.initialRot);
     }
 
     // Reset handler for HUD button
@@ -244,6 +263,19 @@ FpsWalker.prototype.update = function (dt) {
     var app   = this.app;
     var dtSec = dt || 0.016;
 
+    // ─── Spawn-Lock: กันมุมกล้องพลิกหรือตกจากพื้น 15 เฟรมแรก ───
+    if (this._spawnLock > 0) {
+        this._spawnLock--;
+        this.entity.setPosition(this.initialPos);
+        this.entity.setEulerAngles(this.initialRot);
+        if (this.entity.rigidbody) {
+            this.entity.rigidbody.linearVelocity  = pc.Vec3.ZERO;
+            this.entity.rigidbody.angularVelocity = pc.Vec3.ZERO;
+            this.entity.rigidbody.teleport(this.initialPos, this.initialRot);
+        }
+        return;
+    }
+
     // ─── 1. Cinematic Smooth Camera Look ───
     var rotSmooth = Math.min(1, dtSec * 16);
     this.eulers.x = pc.math.lerp(this.eulers.x, this.targetEulers.x, rotSmooth);
@@ -331,10 +363,22 @@ FpsWalker.prototype.update = function (dt) {
         this.eyeEntity.setLocalEulerAngles(0, 0, Math.cos(this.bobTimer * 0.5) * 0.65 * this.bobWeight);
     }
 
-    // ─── 5. [E] key — Return to Floor 01 at Hotspot position ───
+    // ─── 5. Check Proximity to Doorway & [E] Key to Exit back to Floor 01 ───
+    var distToDoor = this.entity.getPosition().distance(this.initialPos);
+    var doorPrompt = document.getElementById("door-prompt");
+    if (doorPrompt) {
+        if (distToDoor < 4.0) {
+            doorPrompt.style.display = "flex";
+        } else {
+            doorPrompt.style.display = "none";
+        }
+    }
+
     if (app.keyboard.wasPressed(pc.KEY_E)) {
         if (typeof window.portalToFloor01 === "function") {
             window.portalToFloor01();
+        } else {
+            window.location.href = "../floor01/?from=9127";
         }
     }
 };

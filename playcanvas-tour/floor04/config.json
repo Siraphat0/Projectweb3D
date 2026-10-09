@@ -460,9 +460,9 @@
             "type": "script",
             "file": {
                 "filename": "__game-scripts.js",
-                "size": 25339,
-                "hash": "1af8ad41c4c9bcad66dd4d41da0636e9",
-                "url": "__game-scripts.js?v=1791104766780"
+                "size": 26384,
+                "hash": "aa6aca1b96dc0f120c2953fa589b161c",
+                "url": "__game-scripts.js?v=1791112000000"
             },
             "data": {
                 "scripts": {

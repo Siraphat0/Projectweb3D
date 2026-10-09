@@ -9,7 +9,7 @@ window.CONTEXT_OPTIONS = {
     'powerPreference': "high-performance"
 };
 window.SCRIPTS = [ 309456492 ];
-window.CONFIG_FILENAME = "config.json";
+window.CONFIG_FILENAME = "config.json?v=1791112000000";
 window.INPUT_SETTINGS = {
     useKeyboard: true,
     useMouse: true,

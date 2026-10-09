@@ -45,6 +45,33 @@ FpsWalker.prototype.initialize = function () {
     // Spawn point at elevator (Floor 01)
     this.initialPos = new pc.Vec3(7.81, 3.34, -0.55);
     this.initialRot = new pc.Vec3(0.0, 180.0, 0.0);
+
+    // ── ตรวจสอบตำแหน่งเดิมเมื่อกลับมาจากห้อง (Return from Room Memory) ──
+    var returnData = null;
+    try {
+        var rawReturn = sessionStorage.getItem('floor01_return_spawn');
+        if (rawReturn) {
+            returnData = JSON.parse(rawReturn);
+            sessionStorage.removeItem('floor01_return_spawn');
+        }
+    } catch (e) {}
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var fromRoom = urlParams.get('from');
+    if (!returnData && fromRoom) {
+        var fallbackHotspots = {
+            '9127': { x: -24.50, y: 3.34, z: -19.50, pitch: 0, yaw: -45 }
+        };
+        if (fallbackHotspots[fromRoom]) returnData = fallbackHotspots[fromRoom];
+    }
+
+    if (returnData && typeof returnData.x === 'number') {
+        this.initialPos = new pc.Vec3(returnData.x, returnData.y, returnData.z);
+        if (typeof returnData.yaw === 'number') {
+            this.initialRot = new pc.Vec3(returnData.pitch || 0, returnData.yaw, 0);
+        }
+    }
+
     this.elevatorPos = new pc.Vec2(10.533, -2.68);
     this._spawnLock = 15;
     this.entity.setPosition(this.initialPos);
@@ -263,8 +290,24 @@ FpsWalker.prototype.initialize = function () {
             }
         }
 
+        function saveCurrentSpawn(roomKey) {
+            try {
+                var p = self.entity.getPosition();
+                var data = {
+                    x: p.x,
+                    y: p.y,
+                    z: p.z,
+                    pitch: self.eulers.x || 0,
+                    yaw: self.eulers.y || 0,
+                    room: roomKey
+                };
+                sessionStorage.setItem('floor01_return_spawn', JSON.stringify(data));
+            } catch (e) {}
+        }
+
         // 2. Room 9127
         if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
+            saveCurrentSpawn('9127');
             if (window.portalTo9127) { window.portalTo9127(); return; }
             else { window.location.href = '../9127/'; return; }
         }

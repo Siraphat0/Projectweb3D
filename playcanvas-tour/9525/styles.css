@@ -255,11 +255,12 @@ canvas:focus {
     inset: 0;
     z-index: 5000;
     pointer-events: none;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.6s ease;
 }
 
-#tour-hud.active {
+#tour-hud.active,
+#tour-hud.visible {
     opacity: 1;
 }
 

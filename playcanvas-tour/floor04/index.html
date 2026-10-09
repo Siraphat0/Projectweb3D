@@ -11,11 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <style></style>
     <link rel="manifest" href="manifest.json">
 
     <script src="playcanvas-stable.min.js"></script>
-    <script src="__settings__.js"></script>
+    <script src="__settings__.js?v=1791112000000"></script>
 
     <!-- Dropdown Interaction Script -->
     <script>
@@ -202,7 +201,7 @@
                     </button>
                 </div>
                 <button class="elevator-modal-close"
-                    onclick="document.getElementById('elevator-modal').style.display='none';">✕ ปิดหน้าต่าง</button>
+                    onclick="window.closeElevatorModal ? window.closeElevatorModal() : (document.getElementById('elevator-modal').style.display='none');">✕ ปิดหน้าต่าง</button>
             </div>
         </div>
 
@@ -277,9 +276,11 @@
             var STORAGE_KEY = 'floor04_hotspots_v1';
             var DEFAULT_HOTSPOTS = [
                 { "id": "hs_1790938323260", "name": "ลิฟต์ชั้น4", "hint": "กด [E] หรือคลิกเพื่อเลือกชั้น", "icon": "🛗", "url": "#elevator", "prox": 3, "pos": { "x": 2.823, "y": 3.15, "z": 24.654 } },
-                { "id": "hs_1791026569984", "name": "ห้อง9428", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 1.679, "y": 3.15, "z": 21.867 } },
-                { "id": "hs_1790938103607", "name": "ห้อง9422", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9422/", "prox": 3, "pos": { "x": -5.478, "y": 3.15, "z": -1.505 } },
-                { "id": "hs_1790919204488", "name": "ห้อง9421", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 2.975, "y": 3.15, "z": 21.735 } }
+                { "id": "hs_1791314190102", "name": "ห้อง9428", "hint": "กด [E] หรือคลิกเพื่อดูข้อมูล", "icon": "🚪", "url": "#", "prox": 2.0, "pos": { "x": 1.367, "y": 3.15, "z": 21.828 } },
+                { "id": "hs_1791314173243", "name": "ห้อง9421", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9422/", "prox": 2.0, "pos": { "x": 2.976, "y": 3.15, "z": 12.765 } },
+                { "id": "hs_1791314089737", "name": "ห้อง9422", "hint": "กด [E] หรือคลิกเพื่อเข้าห้อง", "icon": "🚪", "url": "../9422/", "prox": 3, "pos": { "x": 6.774, "y": 3.15, "z": 13.191 } },
+                { "id": "hs_1790938136803", "name": "ห้อง9427", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": -1.573, "y": 3.25, "z": 25.781 } },
+                { "id": "hs_1790919266134", "name": "ห้อง9423", "hint": "คลิกเพื่อเข้า", "icon": "🚪", "url": "#", "prox": 3, "pos": { "x": 4.062, "y": 2.665, "z": -5.445 } }
             ];
 
             try {
@@ -288,7 +289,12 @@
                     hotspots = JSON.parse(saved);
                     var prevLen = hotspots.length;
                     hotspots = hotspots.filter(function (h) {
-                        return h && h.id !== 'hs_elevator_floor04' && h.name !== 'ลิฟต์ชั้น 4';
+                        if (!h) return false;
+                        if (h.id === 'hs_elevator_floor04' || h.name === 'ลิฟต์ชั้น 4') return false;
+                        if (h.id === 'hs_meeting_room_f04' || (h.name && h.name.indexOf('ห้องประชุม') !== -1)) return false;
+                        // Filter out old stale IDs replaced by new pins
+                        if (h.id === 'hs_1791026569984' || h.id === 'hs_1790919204488' || h.id === 'hs_1790938103607') return false;
+                        return true;
                     });
                     if (hotspots.length !== prevLen) {
                         saveToStorage();
@@ -436,10 +442,10 @@
             renderList();
         })();
     </script>
-    <script src="../nav-guide.js"></script>
-    <script src="__modules__.js"></script>
-    <script src="__start__.js"></script>
-    <script src="__loading__.js"></script>
+    <script src="../nav-guide.js?v=1791108899000"></script>
+    <script src="__modules__.js?v=1791108899000"></script>
+    <script src="__start__.js?v=1791108899000"></script>
+    <script src="__loading__.js?v=1791108899000"></script>
 </body>
 
 </html>

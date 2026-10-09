@@ -14,7 +14,7 @@ pc.script.createLoadingScreen((app) => {
     window.portalToFloor05 = function () {
         if (portalFade) portalFade.classList.add('active');
         setTimeout(() => {
-            window.location.href = '../floor05/';
+            window.location.href = '../floor05/?from=9525';
         }, 500);
     };
 
@@ -122,7 +122,10 @@ pc.script.createLoadingScreen((app) => {
     const hideLoadingScreen = () => {
         if (!loadingScreen) return;
         loadingScreen.classList.add('hidden');
-        if (tourHud) tourHud.classList.add('visible');
+        if (tourHud) {
+            tourHud.classList.add('active');
+            tourHud.classList.add('visible');
+        }
 
         setTimeout(() => {
             loadingScreen.remove();

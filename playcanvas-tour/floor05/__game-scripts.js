@@ -71,6 +71,36 @@ FpsWalker.prototype.initialize = function () {
     this.initialPos = new pc.Vec3(-2.96, this.floorY + 0.50, -0.98);
     this.initialRot = new pc.Vec3(this.eulers.x, this.eulers.y, 0);
 
+    // ── ตรวจสอบตำแหน่งเดิมเมื่อกลับมาจากห้อง (Return from Room Memory) ──
+    var returnData = null;
+    try {
+        var rawReturn = sessionStorage.getItem('floor05_return_spawn');
+        if (rawReturn) {
+            returnData = JSON.parse(rawReturn);
+            sessionStorage.removeItem('floor05_return_spawn');
+        }
+    } catch (e) {}
+
+    // Fallback จาก URL query parameter เช่น ?from=9525 หรือ ?from=9524
+    var urlParams = new URLSearchParams(window.location.search);
+    var fromRoom = urlParams.get('from');
+    if (!returnData && fromRoom) {
+        var fallbackHotspots = {
+            '9525': { x: 10.15, y: this.floorY + 0.50, z: 2.65, pitch: 0, yaw: -90 },
+            '9524': { x: 6.85,  y: this.floorY + 0.50, z: 1.51, pitch: 0, yaw: -90 }
+        };
+        if (fallbackHotspots[fromRoom]) returnData = fallbackHotspots[fromRoom];
+    }
+
+    if (returnData && typeof returnData.x === 'number') {
+        this.initialPos = new pc.Vec3(returnData.x, returnData.y, returnData.z);
+        if (typeof returnData.yaw === 'number') {
+            this.initialRot = new pc.Vec3(returnData.pitch || 0, returnData.yaw, 0);
+            this.eulers.set(this.initialRot.x, this.initialRot.y, 0);
+            this.targetEulers.set(this.initialRot.x, this.initialRot.y, 0);
+        }
+    }
+
     // พิกัดประตูลิฟต์ชั้น 5
     this.elevatorPos = new pc.Vec2(-2.96, -0.98);
 
@@ -317,14 +347,31 @@ FpsWalker.prototype.initialize = function () {
             }
         }
 
+        function saveCurrentSpawn(roomKey) {
+            try {
+                var p = self.entity.getPosition();
+                var data = {
+                    x: p.x,
+                    y: p.y,
+                    z: p.z,
+                    pitch: self.eulers.x || 0,
+                    yaw: self.eulers.y || 0,
+                    room: roomKey
+                };
+                sessionStorage.setItem('floor05_return_spawn', JSON.stringify(data));
+            } catch (e) {}
+        }
+
         // 2. Room 9524 (ห้อง 9524 ชั้น 5)
         if (url.indexOf('9524') !== -1 || name.indexOf('9524') !== -1) {
+            saveCurrentSpawn('9524');
             if (window.portalTo9524) { window.portalTo9524(); return; }
             else { window.location.href = '../9524/'; return; }
         }
 
         // Room 9525 (ห้อง 9525 ชั้น 5)
         if (url.indexOf('9525') !== -1 || name.indexOf('9525') !== -1) {
+            saveCurrentSpawn('9525');
             if (window.portalTo9525) { window.portalTo9525(); return; }
             else { window.location.href = '../9525/'; return; }
         }
@@ -332,12 +379,14 @@ FpsWalker.prototype.initialize = function () {
         // Room 9421 / 9422
         if (url.indexOf('9422') !== -1 || name.indexOf('9422') !== -1 ||
             url.indexOf('9421') !== -1 || name.indexOf('9421') !== -1) {
+            saveCurrentSpawn('9422');
             if (window.portalTo9422) { window.portalTo9422(); return; }
             else { window.location.href = '../9422/'; return; }
         }
 
         // Room 9127
         if (url.indexOf('9127') !== -1 || name.indexOf('9127') !== -1) {
+            saveCurrentSpawn('9127');
             if (window.portalTo9127) { window.portalTo9127(); return; }
             else { window.location.href = '../9127/'; return; }
         }

@@ -259,7 +259,8 @@ canvas:focus {
     transition: opacity 0.6s ease;
 }
 
-#tour-hud.active {
+#tour-hud.active,
+#tour-hud.visible {
     opacity: 1;
 }
 
